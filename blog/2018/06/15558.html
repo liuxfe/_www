@@ -1,0 +1,558 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="source"><meta name="description" content="版本：v4.0.0
+前言受2014年Facebook的Flux架构模式以及函数式编程语言Elm启发，Dan Abramov在2015年创建了 Redux。很快，Redux因其体小精悍（只有2kB..."><title>redux 源码全方位剖析 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="redux 源码全方位剖析">redux 源码全方位剖析</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/redux/">redux</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/source/" rel="tag">source</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/06/29</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 1071</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><p><code>版本：v4.0.0</code></p><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>受2014年Facebook的<code>Flux架构模式</code>以及<code>函数式编程语言Elm</code>启发，Dan Abramov在2015年创建了 Redux。很快，Redux因其体小精悍（只有2kB）且没有任何依赖短时间内成为最热门的前端架构。</p><p>Redux 是可预测的状态管理框架，它很好的解决多交互，多数据源的诉求。Redux 设计之初，作者就严格遵循三个设计理念原则：<br><strong>单一数据源：</strong>整个应用的 state 都被储存在一棵 object tree 中，并且这个 object tree 只存在于唯一一个 store 中。store 可以看做是数据存储的一个容器，在这个容器里面，只会维护唯一一个 state tree。store 会给定4种基础操作API：<code>dispatch(action)，getState()，replaceReducer(nextReducer)，subscribe(listener)</code>。根据单一数据源原则，所有数据会通过<code>store.getState()</code>方法调用获取。<br><strong>state只读：</strong>根据 state 只读原则，数据变更会通过 store，dispatch(action) 方法，Action 可以理解为变更数据的信息载体，type 是变更数据的唯一标志，payload 是用来携带需要变更的数据，格式大致为：<code>const action = &#123; type: &#39;xxx&#39;, payload: &#39;yyy&#39; &#125;</code>；Reducer 是个纯函数，负责根据 action.type 获取需要变更的数据，然后计算 state 数值。格式为：<code>reducer: prevState =&gt; action =&gt; newState</code>。<br><strong>使用纯函数变更state值：</strong>Reducer 只是一些纯函数，它接收先前的 state 和 action，并返回新的 state。</p><p>正常的一个同步数据流为：view 层触发 actionCreator，actionCreator 通过 store.dispatch(action) 方法变更 reducer。但是面对多种多样的业务场景，同步数据流方式显然无法满足。对于改变reducer的异步数据操作，就需要用到中间件的概念，如图所示：</p><p><img src="/images/redux-source-analysis/img1.jpeg" alt="img1.png"></p><h3 id="源码结构"><a href="#源码结构" class="headerlink" title="源码结构"></a>源码结构</h3><p>Redux 的源码结构很简单，源码都在 src 目录下，其目录结构如下：</p><pre class="line-numbers language-none"><code class="language-none">src
+├── utils ---------------------------------------- 工具函数
+├── applyMiddleware.js --------------------------- 加载 middleware
+├── bindActionCreators.js ------------------------ 生成将 action creator 包裹在 dispatch 里的函数
+├── combineReducers.js --------------------------- 合并 reducer 函数
+├── compose.js ----------------------------------- 组合函数
+├── createStore.js ------------------------------- 创建一个 Redux store 来储存应用中所有的 state
+├── index.js ------------------------------------- 入口 js</code></pre><h3 id="源码入口"><a href="#源码入口" class="headerlink" title="源码入口"></a>源码入口</h3><p>index.js 是整个代码的入口，其代码如下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">import createStore from &#39;.&#x2F;createStore&#39;
+import combineReducers from &#39;.&#x2F;combineReducers&#39;
+import bindActionCreators from &#39;.&#x2F;bindActionCreators&#39;
+import applyMiddleware from &#39;.&#x2F;applyMiddleware&#39;
+import compose from &#39;.&#x2F;compose&#39;
+import warning from &#39;.&#x2F;utils&#x2F;warning&#39;
+import __DO_NOT_USE__ActionTypes from &#39;.&#x2F;utils&#x2F;actionTypes&#39;
+
+function isCrushed() &#123;&#125;
+
+if (
+    process.env.NODE_ENV !&#x3D;&#x3D; &#39;production&#39; &amp;&amp;
+    typeof isCrushed.name &#x3D;&#x3D;&#x3D; &#39;string&#39; &amp;&amp;
+    isCrushed.name !&#x3D;&#x3D; &#39;isCrushed&#39;
+) &#123;
+  warning(
+    &#39;You are currently using minified code outside of NODE_ENV &#x3D;&#x3D;&#x3D; &quot;production&quot;. &#39; +
+      &#39;This means that you are running a slower development build of Redux. &#39; +
+      &#39;You can use loose-envify (https:&#x2F;&#x2F;github.com&#x2F;zertosh&#x2F;loose-envify) for browserify &#39; +
+      &#39;or setting mode to production in webpack (https:&#x2F;&#x2F;webpack.js.org&#x2F;concepts&#x2F;mode&#x2F;) &#39; +
+      &#39;to ensure you have the correct code for your production build.&#39;
+  )
+&#125;
+
+export &#123;
+  createStore,
+  combineReducers,
+  bindActionCreators,
+  applyMiddleware,
+  compose,
+  __DO_NOT_USE__ActionTypes
+&#125;
+</code></pre><p>入口代码很简单，首先<code>isCrushed</code>函数主要是为了验证在非生产环境下<code>Redux</code>是否被压缩？如果被压缩了，<code>isCrushed.name !== &#39;isCrushed&#39;</code> 就等于 <code>true</code>，这样就会给开发者一个<code>warn</code>提示。最后暴露<code>createStore</code>、<code>combineReducers</code>、<code>bindActionCreators</code>、<code>applyMiddleware</code>、<code>compose</code> 这几个接口给开发者使用，接下来我们逐一解析这几个 API。</p><h3 id="createStore-js"><a href="#createStore-js" class="headerlink" title="createStore.js"></a>createStore.js</h3><p>createStore.js 是 Redux 最重要的一个 API ，它负责创建一个 Redux store 来储存应用中所有的 state，整个应用中应有且仅有一个 store。现在我们来看一下 createStore 源代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">import $$observable from &#39;symbol-observable&#39;
+
+&#x2F;&#x2F; 私有 action
+import ActionTypes from &#39;.&#x2F;utils&#x2F;actionTypes&#39;
+import isPlainObject from &#39;.&#x2F;utils&#x2F;isPlainObject&#39;
+
+export default function createStore(reducer, preloadedState, enhancer) &#123;
+
+    &#x2F;&#x2F; 判断接受的参数个数，来指定 reducer、preloadedState 和 enhancer
+    if (typeof preloadedState &#x3D;&#x3D;&#x3D; &#39;function&#39; &amp;&amp; typeof enhancer &#x3D;&#x3D;&#x3D; &#39;undefined&#39;) &#123;
+        enhancer &#x3D; preloadedState
+        preloadedState &#x3D; undefined
+    &#125;
+
+    &#x2F;&#x2F; 如果 enhancer 存在且是个合法的函数，就调用 enhancer，否则抛出错误提示
+    if (typeof enhancer !&#x3D;&#x3D; &#39;undefined&#39;) &#123;
+        if (typeof enhancer !&#x3D;&#x3D; &#39;function&#39;) &#123;
+            throw new Error(&#39;Expected the enhancer to be a function.&#39;)
+        &#125;
+
+        return enhancer(createStore)(reducer, preloadedState)
+    &#125;
+
+    if (typeof reducer !&#x3D;&#x3D; &#39;function&#39;) &#123;
+        throw new Error(&#39;Expected the reducer to be a function.&#39;)
+    &#125;
+    &#x2F;&#x2F; 储存当前的 reducer
+    let currentReducer &#x3D; reducer
+    &#x2F;&#x2F; 储存当前的状态
+    let currentState &#x3D; preloadedState
+    &#x2F;&#x2F; 储存当前的监听函数列表
+    let currentListeners &#x3D; []
+    &#x2F;&#x2F; 储存下一个监听函数列表
+    let nextListeners &#x3D; currentListeners
+    let isDispatching &#x3D; false
+
+    &#x2F;&#x2F; 这个函数可以根据当前监听函数的列表生成新的下一个监听函数列表引用
+    function ensureCanMutateNextListeners() &#123;
+        if (nextListeners &#x3D;&#x3D;&#x3D; currentListeners) &#123;
+            nextListeners &#x3D; currentListeners.slice()
+        &#125;
+    &#125;
+
+  &#x2F;&#x2F; 读取由 store 管理的状态树
+  function getState() &#123;
+    if (isDispatching) &#123;
+      throw new Error(
+        &#39;You may not call store.getState() while the reducer is executing. &#39; +
+          &#39;The reducer has already received the state as an argument. &#39; +
+          &#39;Pass it down from the top reducer instead of reading it from the store.&#39;
+      )
+    &#125;
+
+    return currentState
+  &#125;
+
+  function subscribe(listener) &#123;
+    &#x2F;&#x2F; 判断传入的参数是否为函数
+    if (typeof listener !&#x3D;&#x3D; &#39;function&#39;) &#123;
+      throw new Error(&#39;Expected the listener to be a function.&#39;)
+    &#125;
+
+    if (isDispatching) &#123;
+      throw new Error(
+        &#39;You may not call store.subscribe() while the reducer is executing. &#39; +
+          &#39;If you would like to be notified after the store has been updated, subscribe from a &#39; +
+          &#39;component and invoke store.getState() in the callback to access the latest state. &#39; +
+          &#39;See https:&#x2F;&#x2F;redux.js.org&#x2F;api-reference&#x2F;store#subscribe(listener) for more details.&#39;
+      )
+    &#125;
+
+    let isSubscribed &#x3D; true
+
+    ensureCanMutateNextListeners()
+    nextListeners.push(listener)
+
+    return function unsubscribe() &#123;
+      if (!isSubscribed) &#123;
+        return
+      &#125;
+
+      if (isDispatching) &#123;
+        throw new Error(
+          &#39;You may not unsubscribe from a store listener while the reducer is executing. &#39; +
+            &#39;See https:&#x2F;&#x2F;redux.js.org&#x2F;api-reference&#x2F;store#subscribe(listener) for more details.&#39;
+        )
+      &#125;
+
+      isSubscribed &#x3D; false
+
+      ensureCanMutateNextListeners()
+      const index &#x3D; nextListeners.indexOf(listener)
+      nextListeners.splice(index, 1)
+    &#125;
+  &#125;
+
+  function dispatch(action) &#123;
+    if (!isPlainObject(action)) &#123;
+      throw new Error(
+        &#39;Actions must be plain objects. &#39; +
+          &#39;Use custom middleware for async actions.&#39;
+      )
+    &#125;
+    &#x2F;&#x2F; 判断 action 是否有 type｛必须｝ 属性
+    if (typeof action.type &#x3D;&#x3D;&#x3D; &#39;undefined&#39;) &#123;
+      throw new Error(
+        &#39;Actions may not have an undefined &quot;type&quot; property. &#39; +
+          &#39;Have you misspelled a constant?&#39;
+      )
+    &#125;
+    &#x2F;&#x2F; 如果正在 dispatch 则抛出错误
+    if (isDispatching) &#123;
+      throw new Error(&#39;Reducers may not dispatch actions.&#39;)
+    &#125;
+    &#x2F;&#x2F; 对抛出 error 的兼容，但是无论如何都会继续执行 isDispatching &#x3D; false 的操作
+    try &#123;
+      isDispatching &#x3D; true
+      &#x2F;&#x2F; 使用 currentReducer 来操作传入 当前状态和 action，放回处理后的状态
+      currentState &#x3D; currentReducer(currentState, action)
+    &#125; finally &#123;
+      isDispatching &#x3D; false
+    &#125;
+
+    const listeners &#x3D; (currentListeners &#x3D; nextListeners)
+    for (let i &#x3D; 0; i &lt; listeners.length; i++) &#123;
+      const listener &#x3D; listeners[i]
+      listener()
+    &#125;
+
+    return action
+  &#125;
+
+  &#x2F;&#x2F; 判断参数是否是函数类型
+  function replaceReducer(nextReducer) &#123;
+    if (typeof nextReducer !&#x3D;&#x3D; &#39;function&#39;) &#123;
+      throw new Error(&#39;Expected the nextReducer to be a function.&#39;)
+    &#125;
+
+    currentReducer &#x3D; nextReducer
+    dispatch(&#123; type: ActionTypes.REPLACE &#125;)
+  &#125;
+
+  function observable() &#123;
+    const outerSubscribe &#x3D; subscribe
+    return &#123;
+      subscribe(observer) &#123;
+        if (typeof observer !&#x3D;&#x3D; &#39;object&#39; || observer &#x3D;&#x3D;&#x3D; null) &#123;
+          throw new TypeError(&#39;Expected the observer to be an object.&#39;)
+        &#125;
+
+        function observeState() &#123;
+          if (observer.next) &#123;
+            observer.next(getState())
+          &#125;
+        &#125;
+
+        observeState()
+        const unsubscribe &#x3D; outerSubscribe(observeState)
+        return &#123; unsubscribe &#125;
+      &#125;,
+
+      [$$observable]() &#123;
+        return this
+      &#125;
+    &#125;
+  &#125;
+
+  dispatch(&#123; type: ActionTypes.INIT &#125;)
+
+  return &#123;
+    dispatch,
+    subscribe,
+    getState,
+    replaceReducer,
+    [$$observable]: observable
+  &#125;
+&#125;</code></pre><p>这里我们首先要讲一下<code>ActionTypes</code>对象，它是 Redux 的私有 action，不允许外界触发，用来初始化 store 的状态树和改变 reducers 后初始化 store 的状态树。接下来我们从不同角度着重来讲一下 createStore 函数：</p><h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><p>它可以接受三个参数：reducer、preloadedState、enhancer：<br><strong>reducer：</strong>函数，返回下一个状态，接受两个参数：当前状态 和 触发的 action；<br><strong>preloadedState：</strong>它是 state 的初始值，可以随意指定，比如服务端渲染的初始状态，但是如果使用 combineReducers 来生成 reducer，那必须保持状态对象的 key 和 combineReducers 中的 key 相对应，另外实际上它并不仅仅是扮演着一个 initialState 的角色，如果我们第二个参数是函数类型，createStore 会认为我们忽略了 preloadedState 而传入了一个enhancer；<br><strong>enhancer：</strong>可选参数，一个组合 store creator 的高阶函数，可以翻译成 store 的增强器，顾名思义，就是增强 store 的功能。一般指定为第三方的中间件，时间旅行，持久化等等，返回一个新的强化过的 store creator，这个函数通常用 Redux 提供的 applyMiddleware 函数来生成。</p><p>根据传入参数的个数和类型，判断 reducer、preloadedState、enhancer。</p><h4 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h4><p>调用完函数的返回值：dispatch、subscribe、getState、replaceReducer 和 [$$observable]，这就是我们开发中主要使用的几个接口。</p><h4 id="enhancer"><a href="#enhancer" class="headerlink" title="enhancer"></a>enhancer</h4><p>如果<code>enhancer</code>参数存在且是个合法的函数，那么就调用<code>enhancer</code>函数。<code>enhancer</code>实际上是一个高阶函数，它的参数是创建<code>store</code>的函数<code>createStore</code>，返回值是一个可以创建功能更加强大的<code>store</code>的函数(enhanced store creator)，这和 React 中的高阶组件的概念很相似。store enhancer 函数的结构一般如下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">function enhancerCreator() &#123;
+  return createStore &#x3D;&gt; (...args) &#x3D;&gt; &#123;
+    &#x2F;&#x2F; do something based old store
+    &#x2F;&#x2F; return a new enhanced store
+  &#125;
+&#125;</code></pre><p>注意，<code>enhancerCreator</code>是用于创建<code>enhancer store</code>的函数，也就是说<code>enhancerCreator</code>的执行结果才是一个<code>enhancer store</code>。<code>...args</code>参数代表创建<code>store</code>所需的参数，也就是<code>createStore</code>接收的参数，实际上就是<code>（reducer, [preloadedState], [enhancer]）</code>。</p><p>现在，我们来创建一个<code>enhancer store</code>，用于输出发送的<code>action</code>的信息和<code>state</code>的变化：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; logging.js（store enhancer）
+export default function logging() &#123;
+  return createStore &#x3D;&gt; (reducer, initialState, enhancer) &#x3D;&gt; &#123;
+    const store &#x3D; createStore(reducer, initialState, enhancer)
+    function dispatch(action) &#123;
+      console.log(&#96;dispatch an action: $&#123;JSON.stringify(action)&#125;&#96;);
+      const res &#x3D; store.dispatch(action);
+      const newState &#x3D; store.getState();
+      console.log(&#96;current state: $&#123;JSON.stringify(newState)&#125;&#96;);
+      return res;
+    &#125;
+    return &#123;...store, dispatch&#125;
+  &#125;
+&#125;</code></pre><p><code>logging()</code>改变了<code>store dispatch</code>的默认行为，在每次发送<code>action</code>前后，都会输出日志信息，然后在创建<code>store</code>上，使用<code>logging()</code>这个store enhancer:</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; store.js
+import &#123; createStore, combineReducers &#125; from &#39;redux&#39;;
+import * as reducer from &#39;..&#x2F;reducer&#39;;
+import logging from &#39;..&#x2F;logging&#39;;
+
+&#x2F;&#x2F;创建一个 Redux store 来以存放应用中所有的 state，应用中应有且仅有一个 store。
+
+var store &#x3D; createStore(
+	combineReducers(reducer),
+	logging()
+);
+
+export default store;</code></pre><h4 id="getState"><a href="#getState" class="headerlink" title="getState"></a>getState</h4><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; 读取由 store 管理的状态树
+function getState() &#123;
+  if (isDispatching) &#123;
+    throw new Error(
+      &#39;You may not call store.getState() while the reducer is executing. &#39; +
+        &#39;The reducer has already received the state as an argument. &#39; +
+        &#39;Pass it down from the top reducer instead of reading it from the store.&#39;
+    )
+  &#125;
+
+  return currentState
+&#125;</code></pre><p>这个函数可以获取当前的状态，createStore 中的 currentState 储存当前的状态树，这是一个闭包，这个参数会持久存在，并且所有的操作状态都是改变这个引用，getState 函数返回当前的 currentState。</p><h4 id="subscribe"><a href="#subscribe" class="headerlink" title="subscribe"></a>subscribe</h4><pre class="line-numbers language-js" data-language="js"><code class="language-js">function subscribe(listener) &#123;
+  &#x2F;&#x2F; 判断传入的参数是否为函数
+  if (typeof listener !&#x3D;&#x3D; &#39;function&#39;) &#123;
+    throw new Error(&#39;Expected the listener to be a function.&#39;)
+  &#125;
+
+  if (isDispatching) &#123;
+    throw new Error(
+      &#39;You may not call store.subscribe() while the reducer is executing. &#39; +
+        &#39;If you would like to be notified after the store has been updated, subscribe from a &#39; +
+        &#39;component and invoke store.getState() in the callback to access the latest state. &#39; +
+        &#39;See https:&#x2F;&#x2F;redux.js.org&#x2F;api-reference&#x2F;store#subscribe(listener) for more details.&#39;
+    )
+  &#125;
+
+  let isSubscribed &#x3D; true
+
+  ensureCanMutateNextListeners()
+  nextListeners.push(listener)
+
+  return function unsubscribe() &#123;
+    if (!isSubscribed) &#123;
+      return
+    &#125;
+
+    if (isDispatching) &#123;
+      throw new Error(
+        &#39;You may not unsubscribe from a store listener while the reducer is executing. &#39; +
+          &#39;See https:&#x2F;&#x2F;redux.js.org&#x2F;api-reference&#x2F;store#subscribe(listener) for more details.&#39;
+      )
+    &#125;
+
+    isSubscribed &#x3D; false
+
+    ensureCanMutateNextListeners()
+    const index &#x3D; nextListeners.indexOf(listener)
+    nextListeners.splice(index, 1)
+  &#125;
+&#125;</code></pre><p>这个函数可以给 store 的状态添加订阅监听函数，一旦调用<code>dispatch</code>，所有的监听函数就会执行；<code>nextListeners</code>就是储存当前监听函数的列表，调用<code>subscribe</code>，传入一个函数作为参数，那么就会给<code>nextListeners</code>列表<code>push</code>这个函数；同时调用<code>subscribe</code>函数会返回一个<code>unsubscribe</code>函数，用来解绑当前传入的函数，同时在<code>subscribe</code>函数定义了一个<code>isSubscribed</code>标志变量来判断当前的订阅是否已经被解绑，解绑的操作就是从<code>nextListeners</code>列表中删除当前的监听函数。</p><h4 id="dispatch"><a href="#dispatch" class="headerlink" title="dispatch"></a>dispatch</h4><pre class="line-numbers language-js" data-language="js"><code class="language-js">function dispatch(action) &#123;
+    if (!isPlainObject(action)) &#123;
+      throw new Error(
+        &#39;Actions must be plain objects. &#39; +
+          &#39;Use custom middleware for async actions.&#39;
+      )
+    &#125;
+    &#x2F;&#x2F; 判断 action 是否有 type｛必须｝ 属性
+    if (typeof action.type &#x3D;&#x3D;&#x3D; &#39;undefined&#39;) &#123;
+      throw new Error(
+        &#39;Actions may not have an undefined &quot;type&quot; property. &#39; +
+          &#39;Have you misspelled a constant?&#39;
+      )
+    &#125;
+    &#x2F;&#x2F; 如果正在 dispatch 则抛出错误
+    if (isDispatching) &#123;
+      throw new Error(&#39;Reducers may not dispatch actions.&#39;)
+    &#125;
+    &#x2F;&#x2F; 对抛出 error 的兼容，但是无论如何都会继续执行 isDispatching &#x3D; false 的操作
+    try &#123;
+      isDispatching &#x3D; true
+      &#x2F;&#x2F; 使用 currentReducer 来操作传入 当前状态和 action，放回处理后的状态
+      currentState &#x3D; currentReducer(currentState, action)
+    &#125; finally &#123;
+      isDispatching &#x3D; false
+    &#125;
+
+    const listeners &#x3D; (currentListeners &#x3D; nextListeners)
+    for (let i &#x3D; 0; i &lt; listeners.length; i++) &#123;
+      const listener &#x3D; listeners[i]
+      listener()
+    &#125;
+
+    return action
+  &#125;</code></pre><p>这个函数是用来触发状态改变的，它接受一个 action 对象作为参数，然后 reducer 根据 action 的属性以及当前 store 的状态来生成一个新的状态，赋予当前状态，改变 store 的状态；即<code>currentState = currentReducer(currentState, action)</code>；这里的<code>currentReducer</code>是一个函数，它接受两个参数：当前状态 和 action，然后返回计算出来的新的状态；然后遍历<code>nextListeners</code>列表，调用每个监听函数。</p><h4 id="replaceReducer"><a href="#replaceReducer" class="headerlink" title="replaceReducer"></a>replaceReducer</h4><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; 判断参数是否是函数类型
+function replaceReducer(nextReducer) &#123;
+  if (typeof nextReducer !&#x3D;&#x3D; &#39;function&#39;) &#123;
+    throw new Error(&#39;Expected the nextReducer to be a function.&#39;)
+  &#125;
+
+  currentReducer &#x3D; nextReducer
+  dispatch(&#123; type: ActionTypes.REPLACE &#125;)
+&#125;</code></pre><p>这个函数可以替换 store 当前的 reducer 函数，首先直接用<code>currentReducer = nextReducer</code>替换；然后<code>dispatch(&#123; type: ActionTypes.INIT &#125;)</code>，用来初始化替换后 reducer 生成的初始化状态并且赋予 store 的状态。</p><h4 id="observable"><a href="#observable" class="headerlink" title="observable"></a>observable</h4><pre class="line-numbers language-js" data-language="js"><code class="language-js">function observable() &#123;
+  const outerSubscribe &#x3D; subscribe
+  return &#123;
+    subscribe(observer) &#123;
+      if (typeof observer !&#x3D;&#x3D; &#39;object&#39; || observer &#x3D;&#x3D;&#x3D; null) &#123;
+        throw new TypeError(&#39;Expected the observer to be an object.&#39;)
+      &#125;
+
+      function observeState() &#123;
+        if (observer.next) &#123;
+          observer.next(getState())
+        &#125;
+      &#125;
+
+      observeState()
+      const unsubscribe &#x3D; outerSubscribe(observeState)
+      return &#123; unsubscribe &#125;
+    &#125;,
+
+    [$$observable]() &#123;
+      return this
+    &#125;
+  &#125;
+&#125;</code></pre><p>对于这个函数，是不直接暴露给开发者的，它提供了给其他观察者模式/响应式库的交互操作。</p><h4 id="初始化-store-的状态"><a href="#初始化-store-的状态" class="headerlink" title="初始化 store 的状态"></a>初始化 store 的状态</h4><p>最后执行<code>dispatch(&#123; type: ActionTypes.INIT &#125;)</code>，用来根据 reducer 初始化 store 的状态。</p><h3 id="compose-js"><a href="#compose-js" class="headerlink" title="compose.js"></a>compose.js</h3><p><code>compose</code>可以接受一组函数参数，然后从右到左来组合多个函数（这是函数式编程中的方法），最后返回一个组合函数。现在我们来看一下 compose 源代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;**
+ * For example, compose(f, g, h) is identical to doing
+ * (...args) &#x3D;&gt; f(g(h(...args))).
+ *&#x2F;
+export default function compose(...funcs) &#123;
+  if (funcs.length &#x3D;&#x3D;&#x3D; 0) &#123;
+    return arg &#x3D;&gt; arg
+  &#125;
+
+  if (funcs.length &#x3D;&#x3D;&#x3D; 1) &#123;
+    return funcs[0]
+  &#125;
+
+  return funcs.reduce((a, b) &#x3D;&gt; (...args) &#x3D;&gt; a(b(...args)))
+&#125;</code></pre><p><code>compose</code>其作用是把一系列的函数，组装生成一个新的函数，并且从后到前，后面参数的执行结果作为其前一个的参数，当需要把多个 store 增强器 依次执行的时候，需要用到它。</p><h4 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h4><p><strong>(…funcs)：</strong>需要合成的多个函数。每个函数都接收一个函数作为参数，然后返回一个函数。</p><h4 id="返回值-1"><a href="#返回值-1" class="headerlink" title="返回值"></a>返回值</h4><p><strong>(Function)：</strong>从右到左把接收到的函数合成后的最终函数。</p><h3 id="applyMiddleware-js"><a href="#applyMiddleware-js" class="headerlink" title="applyMiddleware.js"></a>applyMiddleware.js</h3><blockquote><p>It provides a third-party extension point between dispatching an action, and the moment it reaches the reducer.</p></blockquote><p>这是 redux 作者 Dan 对 middleware 的描述，middleware 提供了一个分类处理 action 的机会，在 middleware 中我们可以检阅每一个流过的 action，挑选出特定类型的 action 进行相应操作，给我们改变 action 的机会。<br>Redux middleware 的设计十分特殊，是一个层层包裹的匿名函数，实际上这是函数式编程中的柯里化，一种使用匿名单参数函数来实现多参数函数的方法，柯里化的 middleware 结构好处在于：<br><strong>一：</strong>易串联，柯里化函数具有延迟执行的特性，通过不断柯里化形成的 middleware 可以累积参数，配合组合的方式，很容易形成 pipeline 来处理数据流。<br><strong>二：</strong>共享 store，在 applyMiddleware 执行过程中，store 还是旧的，但是因为闭包的存在，applyMiddleware 完成后，所有的 middlewares 内部拿到的 store 是最新且相同的。</p><p>redux 提供了 applyMiddleware 这个 api 来加载 middleware。现在我们来看一下 applyMiddleware 源代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">import compose from &#39;.&#x2F;compose&#39;
+
+export default function applyMiddleware(...middlewares) &#123;
+  return createStore &#x3D;&gt; (...args) &#x3D;&gt; &#123;
+    const store &#x3D; createStore(...args)
+    let dispatch &#x3D; () &#x3D;&gt; &#123;
+      throw new Error(
+        &#96;Dispatching while constructing your middleware is not allowed. &#96; +
+          &#96;Other middleware would not be applied to this dispatch.&#96;
+      )
+    &#125;
+    &#x2F;&#x2F; 暴漏 getState 和 dispatch 供第三方中间件使用
+    const middlewareAPI &#x3D; &#123;
+      getState: store.getState,
+      dispatch: (...args) &#x3D;&gt; dispatch(...args)
+    &#125;
+    &#x2F;&#x2F; middlewareAPI 作为每个 middleware 的参数依次执行一遍，最终返回函数组成的数组
+    const chain &#x3D; middlewares.map(middleware &#x3D;&gt; middleware(middlewareAPI))
+    &#x2F;&#x2F; 用 compose 组合函数生成新的 dispatch
+    dispatch &#x3D; compose(...chain)(store.dispatch)
+
+    return &#123;
+      ...store,
+      dispatch
+    &#125;
+  &#125;
+&#125;</code></pre><p>由上我们可以发现 applyMiddleware 的结构也是一个多层柯里化的函数，借助 compose，applyMiddleware 可以用来和其他插件一起加强 createStore 函数。</p><h4 id="参数-2"><a href="#参数-2" class="headerlink" title="参数"></a>参数</h4><p>我们在 createStore 小节中其实就用提及过 applyMiddleware：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; 如果 enhancer 存在且是个合法的函数，就调用 enhancer，否则抛出错误提示
+if (typeof enhancer !&#x3D;&#x3D; &#39;undefined&#39;) &#123;
+  if (typeof enhancer !&#x3D;&#x3D; &#39;function&#39;) &#123;
+    throw new Error(&#39;Expected the enhancer to be a function.&#39;)
+  &#125;
+
+  return enhancer(createStore)(reducer, preloadedState)
+&#125;</code></pre><p>这里 enhancer 其实就等于 applyMiddleware(mid1, mid2, mid3, …)，因此我们创建一个 store 实际上就变成如下方式了：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">applyMiddleware(mid1, mid2, mid3, ...)(createStore)(reducer, preloadedState);</code></pre><p>由上述代码可知 applyMiddleware 陆续可以接受四个参数：<br><strong>[md1, mid2, mid3, …]：</strong> middlewares 数组；<br><strong>createStore：</strong>Redux 原生的 createStore；<br><strong>reducer：</strong>函数，返回下一个状态；<br><strong>preloadedState：</strong>state 的初始值。<br>接下来，我们看一下 applyMiddleware 用这些参数都做了什么？</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">const store &#x3D; createStore(...args)
+const middlewareAPI &#x3D; &#123;
+  getState: store.getState,
+  dispatch: (...args) &#x3D;&gt; dispatch(...args)
+&#125;
+
+const chain &#x3D; middlewares.map(middleware &#x3D;&gt; middleware(middlewareAPI))
+dispatch &#x3D; compose(...chain)(store.dispatch)</code></pre><p>applyMiddleware 利用 createStore 和 (reducer, preloadedState) 创建了一个 store，然后 store 的 getState 方法和 dispatch 方法又分别赋值给 middlewareAPI 变量，紧接着用 middlewareAPI 作为每个 middleware 的参数依次执行一遍，执行完后，最终获得数组 chain：[f1, f2, …, fn] 交给组合函数 compose 处理。compose 可以接受一组函数参数，然后从右到左来组合多个函数（这是函数式编程中的方法），最后返回一个组合函数，例如：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; 调用
+dispatch &#x3D; compose(f, g, h)(store.dispatch)
+&#x2F;&#x2F; 返回
+dispatch &#x3D; f(g(h(store.dispatch)))</code></pre><p>这样通过调用新的 dispatch，每个 middleware 的代码就可以依次执行了。</p><h4 id="返回值-2"><a href="#返回值-2" class="headerlink" title="返回值"></a>返回值</h4><p><strong>store：</strong>原来的store；<br><strong>dispatch：</strong>改变后的dispatch。</p><h3 id="combineReducers-js"><a href="#combineReducers-js" class="headerlink" title="combineReducers.js"></a>combineReducers.js</h3><p>Reducer 是管理 state 的一个模块，它主要做的事情就是当项目初始化时，返回 initalState，当用户用操作时，它会根据 action 进行相应地更新。需要注意的是它是一个纯函数，换言之，它不会改变传入的 state。现在我们来看一下 combineReducers 源码（源码有删减，删除了一些验证代码）：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">import ActionTypes from &#39;.&#x2F;utils&#x2F;actionTypes&#39;
+import warning from &#39;.&#x2F;utils&#x2F;warning&#39;
+import isPlainObject from &#39;.&#x2F;utils&#x2F;isPlainObject&#39;
+
+export default function combineReducers(reducers) &#123;
+  &#x2F;&#x2F; 根据 reducers 生成最终合法的 finalReducers：value 为 函数
+  const reducerKeys &#x3D; Object.keys(reducers)
+  const finalReducers &#x3D; &#123;&#125;
+  for (let i &#x3D; 0; i &lt; reducerKeys.length; i++) &#123;
+    const key &#x3D; reducerKeys[i]
+
+    if (process.env.NODE_ENV !&#x3D;&#x3D; &#39;production&#39;) &#123;
+      if (typeof reducers[key] &#x3D;&#x3D;&#x3D; &#39;undefined&#39;) &#123;
+        warning(&#96;No reducer provided for key &quot;$&#123;key&#125;&quot;&#96;)
+      &#125;
+    &#125;
+
+    if (typeof reducers[key] &#x3D;&#x3D;&#x3D; &#39;function&#39;) &#123;
+      finalReducers[key] &#x3D; reducers[key]
+    &#125;
+  &#125;
+  const finalReducerKeys &#x3D; Object.keys(finalReducers)
+
+  let unexpectedKeyCache
+  if (process.env.NODE_ENV !&#x3D;&#x3D; &#39;production&#39;) &#123;
+    unexpectedKeyCache &#x3D; &#123;&#125;
+  &#125;
+
+  let shapeAssertionError
+  try &#123;
+    assertReducerShape(finalReducers)
+  &#125; catch (e) &#123;
+    shapeAssertionError &#x3D; e
+  &#125;
+
+  &#x2F;&#x2F; 返回最终生成的 reducer
+  return function combination(state &#x3D; &#123;&#125;, action) &#123;
+    if (shapeAssertionError) &#123;
+      throw shapeAssertionError
+    &#125;
+
+    if (process.env.NODE_ENV !&#x3D;&#x3D; &#39;production&#39;) &#123;
+      const warningMessage &#x3D; getUnexpectedStateShapeWarningMessage(
+        state,
+        finalReducers,
+        action,
+        unexpectedKeyCache
+      )
+      if (warningMessage) &#123;
+        warning(warningMessage)
+      &#125;
+    &#125;
+
+    let hasChanged &#x3D; false
+    const nextState &#x3D; &#123;&#125;
+    for (let i &#x3D; 0; i &lt; finalReducerKeys.length; i++) &#123;
+      const key &#x3D; finalReducerKeys[i]
+      const reducer &#x3D; finalReducers[key]
+      const previousStateForKey &#x3D; state[key]
+      const nextStateForKey &#x3D; reducer(previousStateForKey, action)
+      if (typeof nextStateForKey &#x3D;&#x3D;&#x3D; &#39;undefined&#39;) &#123;
+        const errorMessage &#x3D; getUndefinedStateErrorMessage(key, action)
+        throw new Error(errorMessage)
+      &#125;
+      nextState[key] &#x3D; nextStateForKey
+      hasChanged &#x3D; hasChanged || nextStateForKey !&#x3D;&#x3D; previousStateForKey
+    &#125;
+    &#x2F;&#x2F; 遍历一遍验证下是否改变，然后返回原有状态值或者新的状态值
+    return hasChanged ? nextState : state
+  &#125;
+&#125;</code></pre><p>该函数最终返回 combination 函数，它就是真正 createStore 函数的 reducer，接受一个初始化状态和一个 action 参数；该函数每次调用大致执行以下几个操作：<br><strong>1、</strong><code>for (let i = 0; i &lt; finalReducerKeys.length; i++) &#123; ... &#125;：</code>遍历 finalReducer（有效的 reducer 列表）；<br><strong>2、</strong><code>var previousStateForKey = state[key]：</code>当前遍历项的之前状态，看到这里就应该明白传入的 <code>reducers</code> 组合为什么 <code>key</code> 要和 store 里面的 state 的 <code>key</code> 相对应了；<br><strong>3、</strong><code>var nextStateForKey = reducer(previousStateForKey, action)：</code>当前遍历项的下一个状态；<br><strong>4、</strong><code>nextState[key] = nextStateForKey：</code>将 当前遍历项的下一个状态添加到 nextState；<br><strong>5、</strong><code>hasChanged = hasChanged || nextStateForKey !== previousStateForKey：</code>判断状态是否改变；<br><strong>6、</strong><code>return hasChanged ? nextState : state：</code>如果没有改变就返回原有状态，如果改变了就返回新生成的状态对象。</p><h4 id="参数-3"><a href="#参数-3" class="headerlink" title="参数"></a>参数</h4><p>**reducers (Object): **一个对象，它的值（value）对应不同的 reducer 函数，这些 reducer 函数后面会被合并成一个。</p><h4 id="返回值-3"><a href="#返回值-3" class="headerlink" title="返回值"></a>返回值</h4><p><strong>(Function)：</strong>它是真正 createStore 函数的 reducer，接受一个初始化状态和一个 action 参数；每次调用的时候会去遍历 finalReducer（有效的 reducer 列表），然后调用列表中每个 reducer，最终构造一个与 reducers 对象结构相同的 state 对象。</p><h3 id="bindActionCreators-js"><a href="#bindActionCreators-js" class="headerlink" title="bindActionCreators.js"></a>bindActionCreators.js</h3><p>Redux 中的 bindActionCreators 是通过 dispatch 将 action 包裹起来，这样就可以通过 bindActionCreators 创建方法调用 dispatch(action)。现在我们来看一下 bindActionCreators 源代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">function bindActionCreator(actionCreator, dispatch) &#123;
+  return function() &#123;
+    return dispatch(actionCreator.apply(this, arguments))
+  &#125;
+&#125;
+
+export default function bindActionCreators(actionCreators, dispatch) &#123;
+  &#x2F;&#x2F; 如果是一个函数，直接返回一个 bindActionCreator 函数，即调用 dispatch 触发 action
+  if (typeof actionCreators &#x3D;&#x3D;&#x3D; &#39;function&#39;) &#123;
+    return bindActionCreator(actionCreators, dispatch)
+  &#125;
+
+  if (typeof actionCreators !&#x3D;&#x3D; &#39;object&#39; || actionCreators &#x3D;&#x3D;&#x3D; null) &#123;
+    throw new Error(
+      &#96;bindActionCreators expected an object or a function, instead received $&#123;
+        actionCreators &#x3D;&#x3D;&#x3D; null ? &#39;null&#39; : typeof actionCreators
+      &#125;. &#96; +
+        &#96;Did you write &quot;import ActionCreators from&quot; instead of &quot;import * as ActionCreators from&quot;?&#96;
+    )
+  &#125;
+  &#x2F;&#x2F; 遍历对象，然后设置每个遍历项的 actionCreator 生成函数，最后返回这个对象
+  const keys &#x3D; Object.keys(actionCreators)
+  const boundActionCreators &#x3D; &#123;&#125;
+  for (let i &#x3D; 0; i &lt; keys.length; i++) &#123;
+    const key &#x3D; keys[i]
+    const actionCreator &#x3D; actionCreators[key]
+    if (typeof actionCreator &#x3D;&#x3D;&#x3D; &#39;function&#39;) &#123;
+      boundActionCreators[key] &#x3D; bindActionCreator(actionCreator, dispatch)
+    &#125;
+  &#125;
+  return boundActionCreators
+&#125;</code></pre><p>由此可以看出 bindActionCreators 的实现逻辑比较简单：<br><strong>一、</strong>判断传入的参数是否是 object，如果是函数，就直接返回一个将 action creator 包裹在 dispatch 里的函数。<br><strong>二、</strong>如果是object，就根据相应的key，生成相应的将 action creator 包裹在 dispatch 里的函数。</p><p>为了方便理解，我们用一个 TODO 例子说明下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; actions&#x2F;todo.js
+export function addTodo(text) &#123;
+  return &#123;
+    type: &#39;ADD_TODO&#39;,
+    text
+  &#125;
+&#125;
+
+export function removeTodo(id) &#123;
+  return &#123;
+    type: &#39;REMOVE_TODO&#39;,
+    id
+  &#125;
+&#125;</code></pre><p>我们 import 后会得到如下对象：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#123;
+   addTodo : text &#x3D;&gt; 
+    &#123; 
+      type: &#39;ADD_TODO&#39;,
+      text
+    &#125;,
+   removeTodo : id &#x3D;&gt; &#123;
+      type: &#39;REMOVE_TODO&#39;,
+      id
+    &#125;
+&#125;</code></pre><p>经过 bindActionCreator 就会变成 key 相同，值为用 dispatch 将 action creator 包裹起来的函数的对象：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#123;
+   addTodo : text &#x3D;&gt; dispatch(addTodo(&#39;text&#39;));
+   removeTodo : id &#x3D;&gt; dispatch(removeTodo(&#39;id&#39;));
+&#125;</code></pre><p>由此我们发现可以通过 bindActionCreators 创建方法直接调用 dispatch(action)。</p><h4 id="参数-4"><a href="#参数-4" class="headerlink" title="参数"></a>参数</h4><p>它可以接收两个参数：actionCreators、dispatch<br><strong>actionCretors：</strong>可以是一个对象，也可以是一个单个函数<br><strong>dispatch：</strong>dispatch 函数，从 store 实例中获取，用于包裹 action creator</p><p>如果只是传入一个 function，返回的也是一个 function，例如：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; actions&#x2F;todo.js
+export const toggleTodo &#x3D; (id) &#x3D;&gt; &#123;
+  return &#123;
+      type: &#39;TOGGLE_TODO&#39;,
+      id
+  &#125;;
+&#125;;
+</code></pre><p>经过 bindActionCreator：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">const boundActionCreators &#x3D; bindActionCreators(toggleTodo, dispatch);</code></pre><p>由于 bindActionCreators 第一个参数是一个函数，结果就会变为：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">const boundActionCreators  &#x3D; (id) &#x3D;&gt; dispatch(toggleTodo(id));</code></pre><h4 id="返回值-4"><a href="#返回值-4" class="headerlink" title="返回值"></a>返回值</h4><p>单个函数，或者是一个对象。</p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>通过阅读 Redux 的源码，我们发现 Redux 设计的实在是太精妙了，完全函数式编程，依赖少，耦合低。</p></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/07/2811.html" class="pre-post btn btn-default" title="深入探究 setTimeout"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">深入探究 setTimeout</span> </a><a href="/blog/2018/06/45204.html" class="next-post btn btn-default" title="vuex 源码全方位剖析"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">vuex 源码全方位剖析</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

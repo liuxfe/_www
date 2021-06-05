@@ -1,0 +1,221 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="module"><meta name="description" content="前言ES6标准发布后，module成为标准，标准的使用是以export指令导出接口，以import引入模块，但是在我们一贯的node模块中，我们采用的是CommonJS规范，使用require引..."><title>深聊import、require、export、module.exports | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="深聊import、require、export、module.exports">深聊import、require、export、module.exports</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/javascript/">javascript</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/module/" rel="tag">module</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/07/05</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 1065</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>ES6标准发布后，module成为标准，标准的使用是以export指令导出接口，以import引入模块，但是在我们一贯的node模块中，我们采用的是CommonJS规范，使用require引入模块，使用module.exports导出接口，甚至有时候也会常常看到两者互用的场景。只有把这些语法搞清楚才能在未来的标准编程游刃有余。</p><h2 id="webpack-模块化"><a href="#webpack-模块化" class="headerlink" title="webpack 模块化"></a>webpack 模块化</h2><p>webpack 本身维护了一套模块系统，这套模块系统兼容了所有前端历史进程下的模块规范，包括 amd commonjs es6 等，本文主要针对 commonjs es6 规范进行说明。模块化的实现其实就在最后编译的文件内。</p><h3 id="我们以一个小-demo-为例"><a href="#我们以一个小-demo-为例" class="headerlink" title="我们以一个小 demo 为例"></a>我们以一个小 demo 为例</h3><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; webpack.config.js
+const path &#x3D; require(&#39;path&#39;);
+
+module.exports &#x3D; &#123;
+    devtool: &quot;source-map&quot;,
+    mode: &#39;development&#39;,
+    entry: &#39;.&#x2F;main.js&#39;,
+    output: &#123;
+        path: path.resolve(__dirname, &#39;dist&#39;),
+        filename: &#39;bundle.js&#39;,
+    &#125;
+&#125;
+
+&#x2F;&#x2F; main.js
+import helloWorld from &#39;.&#x2F;src&#x2F;index1&#39;;
+import worldHello from &#39;.&#x2F;src&#x2F;index2&#39;;
+
+console.log(helloWorld, worldHello);
+export default &#39;.&#x2F;main.js&#39;;
+
+&#x2F;&#x2F; index1.js
+export default &#39;Hello World&#39;;
+
+&#x2F;&#x2F; index2.js
+export default &#39;World Hello&#39;;</code></pre><h3 id="demo-打包后文件"><a href="#demo-打包后文件" class="headerlink" title="demo 打包后文件"></a>demo 打包后文件</h3><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; webpackBootstrap 启动函数
+&#x2F;&#x2F; modules 即为存放所有模块的对象，对象中的每一个属性都是一个函数
+(function(modules) &#123;
+    &#x2F;&#x2F; 安装过的模块都存放在这里面，作用是把已经加载过的模块缓存在内存中，提升性能
+    var installedModules &#x3D; &#123;&#125;;
+    &#x2F;&#x2F; 加载参数对象中每一个模块，moduleId 为要加载模块对象的 key
+    &#x2F;&#x2F; 函数作用和 Node.js 中 require 语句相似
+    function __webpack_require__(moduleId) &#123;
+        &#x2F;&#x2F; 如果需要加载的模块已经被加载过，就直接从内存缓存中返回
+        if(installedModules[moduleId]) &#123;
+            return installedModules[moduleId].exports;
+        &#125;
+
+        &#x2F;&#x2F; 如果缓存中不存在需要加载的模块，就新建一个模块，并把它存在缓存中
+        &#x2F;&#x2F; webpack1的时候都是全称，现在估计为了省点空间，都变成了id &#x3D;&gt; i, load &#x3D;&gt; l
+        var module &#x3D; installedModules[moduleId] &#x3D; &#123;
+            &#x2F;&#x2F; 加载模块对象的 key
+            i: moduleId,
+            &#x2F;&#x2F; 该模块是否已经加载完毕
+            l: false,
+            &#x2F;&#x2F; 该模块的导出值
+            exports: &#123;&#125;
+        &#125;;
+
+        &#x2F;&#x2F; 从 modules 中获取 key 为 moduleId 的模块对应的函数
+        &#x2F;&#x2F; 再调用这个函数，同时把函数需要的参数传入
+        modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+        &#x2F;&#x2F; 把这个模块标记为已加载
+        module.l &#x3D; true;
+
+        &#x2F;&#x2F; 返回这个模块的导出值
+        return module.exports;
+    &#125;
+
+    &#x2F;&#x2F; 在源文件中，直接使用__webpack_modules__，生成文件用__webpack_require__.m替换
+    __webpack_require__.m &#x3D; modules;
+
+    &#x2F;&#x2F; 暴露module缓存
+    __webpack_require__.c &#x3D; installedModules;
+
+    &#x2F;&#x2F; 为harmory exports 定义 getter function, configurable&#x3D;false表明，此属性不能修改
+    &#x2F;&#x2F; 例如export const，由于是常量，需要用__webpack_require__.d进行定义
+    __webpack_require__.d &#x3D; function(exports, name, getter) &#123;
+        if(!__webpack_require__.o(exports, name)) &#123;
+            Object.defineProperty(exports, name, &#123; enumerable: true, get: getter &#125;);
+        &#125;
+    &#125;;
+
+    &#x2F;&#x2F; define __esModule on exports
+    __webpack_require__.r &#x3D; function(exports) &#123;
+        if(typeof Symbol !&#x3D;&#x3D; &#39;undefined&#39; &amp;&amp; Symbol.toStringTag) &#123;
+            Object.defineProperty(exports, Symbol.toStringTag, &#123; value: &#39;Module&#39; &#125;);
+        &#125;
+        Object.defineProperty(exports, &#39;__esModule&#39;, &#123; value: true &#125;);
+    &#125;;
+
+    &#x2F;&#x2F; create a fake namespace object
+    &#x2F;&#x2F; mode &amp; 1: value is a module id, require it
+    &#x2F;&#x2F; mode &amp; 2: merge all properties of value into the ns
+    &#x2F;&#x2F; mode &amp; 4: return value when already ns object
+    &#x2F;&#x2F; mode &amp; 8|1: behave like require
+    __webpack_require__.t &#x3D; function(value, mode) &#123;
+        if(mode &amp; 1) value &#x3D; __webpack_require__(value);
+        if(mode &amp; 8) return value;
+        if((mode &amp; 4) &amp;&amp; typeof value &#x3D;&#x3D;&#x3D; &#39;object&#39; &amp;&amp; value &amp;&amp; value.__esModule) return value;
+        var ns &#x3D; Object.create(null);
+        __webpack_require__.r(ns);
+        Object.defineProperty(ns, &#39;default&#39;, &#123; enumerable: true, value: value &#125;);
+        if(mode &amp; 2 &amp;&amp; typeof value !&#x3D; &#39;string&#39;) for(var key in value) __webpack_require__.d(ns, key, function(key) &#123; return value[key]; &#125;.bind(null, key));
+            return ns;
+    &#125;;
+
+    &#x2F;&#x2F; 兼容 non-harmony 模块，这些模块如果设了__esModule属性，则被标记为non-harmony
+    __webpack_require__.n &#x3D; function(module) &#123;
+        var getter &#x3D; module &amp;&amp; module.__esModule ?
+            function getDefault() &#123; return module[&#39;default&#39;]; &#125; :
+            function getModuleExports() &#123; return module; &#125;;
+        __webpack_require__.d(getter, &#39;a&#39;, getter);
+        return getter;
+    &#125;;
+
+    &#x2F;&#x2F; Object.prototype.hasOwnProperty.call
+    __webpack_require__.o &#x3D; function(object, property) &#123; return Object.prototype.hasOwnProperty.call(object, property); &#125;;
+
+    &#x2F;&#x2F; Webpack 配置中的 publicPath，用于加载被分割出去的异步代码
+    __webpack_require__.p &#x3D; &quot;&quot;;
+
+    &#x2F;&#x2F; 使用 __webpack_require__ 去加载 key 为 .&#x2F;main.js 的模块，并且返回该模块导出的内容
+    &#x2F;&#x2F; key 为 .&#x2F;main.js 的模块就是 main.js 对应的文件，也就是执行入口模块
+    &#x2F;&#x2F; __webpack_require__.s 的含义是启动模块对应的 key
+    return __webpack_require__(__webpack_require__.s &#x3D; &quot;.&#x2F;main.js&quot;);
+&#125;)(&#123;
+&#x2F;&#x2F; 所有的模块都存放在了一个对象里，根据每个模块在对象的 key 来区分和定位模块
+&quot;.&#x2F;main.js&quot;: (function(module, __webpack_exports__, __webpack_require__) &#123;
+        &quot;use strict&quot;;
+        __webpack_require__.r(__webpack_exports__);
+        var _src_index1__WEBPACK_IMPORTED_MODULE_0__ &#x3D; __webpack_require__(&quot;.&#x2F;src&#x2F;index1.js&quot;);
+        var _src_index2__WEBPACK_IMPORTED_MODULE_1__ &#x3D; __webpack_require__(&quot;.&#x2F;src&#x2F;index2.js&quot;);
+        console.log(_src_index1__WEBPACK_IMPORTED_MODULE_0__[&quot;default&quot;], _src_index2__WEBPACK_IMPORTED_MODULE_1__[&quot;default&quot;]);
+        __webpack_exports__[&quot;default&quot;] &#x3D; (&#39;.&#x2F;main.js&#39;);
+    &#125;),
+
+&quot;.&#x2F;src&#x2F;index1.js&quot;: (function(module, __webpack_exports__, __webpack_require__) &#123;
+        &quot;use strict&quot;;
+        __webpack_require__.r(__webpack_exports__);
+        __webpack_exports__[&quot;default&quot;] &#x3D; (&#39;Hello World&#39;);
+    &#125;),
+
+&quot;.&#x2F;src&#x2F;index2.js&quot;: (function(module, __webpack_exports__, __webpack_require__) &#123;
+        &quot;use strict&quot;;
+        __webpack_require__.r(__webpack_exports__);
+        __webpack_exports__[&quot;default&quot;] &#x3D; (&#39;World Hello&#39;);
+    &#125;)
+&#125;);</code></pre><p>上面这段 js 就是使用 webpack 编译后的代码，其中就包含了 webpack 的运行时代码，其中就是关于模块的实现。</p><p>以上看上去复杂的代码其实是一个立即执行函数，可以简写为如下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">(function(modules) &#123;
+
+  &#x2F;&#x2F; 模拟 require 语句
+  function __webpack_require__() &#123;
+  &#125;
+
+  &#x2F;&#x2F; 执行存放所有模块中 key 值为 .&#x2F;main.js 的模块
+  __webpack_require__(&#39;.&#x2F;main.js&#39;);
+
+&#125;)(&#123;
+    &quot;.&#x2F;main.js&quot;: fn &#x2F;&#x2F; 函数
+&#125;)</code></pre><p>自执行函数的入参是个对象，这个对象包含了所有的模块，包裹在函数中。<br>自执行函数体里的逻辑就是处理模块的逻辑。关键在于<code>__webpack_require__</code>函数，这个函数就是<code>require</code>或者是<code>import</code>的替代，我们可以看到在函数体内先定义了这个函数，然后调用了它。这里会传入一个<code>moduleId</code>，这个例子中是<code>./main.js</code>，也就是我们的入口模块<code>main.js</code>的内容。</p><p>我们再看<code>__webpack_require__</code>内执行了：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+return module.exports；</code></pre><p>即从入参的 modules 对象中取第一个函数进行调用，并入参：</p><ul><li>module</li><li>module.exports</li><li>webpack_require</li></ul><p>我们再看第一个函数（即入口模块）的逻辑：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">(function(module, __webpack_exports__, __webpack_require__) &#123;
+    &quot;use strict&quot;;
+    __webpack_require__.r(__webpack_exports__);
+    var _src_index1__WEBPACK_IMPORTED_MODULE_0__ &#x3D; __webpack_require__(&quot;.&#x2F;src&#x2F;index1.js&quot;);
+    var _src_index2__WEBPACK_IMPORTED_MODULE_1__ &#x3D; __webpack_require__(&quot;.&#x2F;src&#x2F;index2.js&quot;);
+    console.log(_src_index1__WEBPACK_IMPORTED_MODULE_0__[&quot;default&quot;], _src_index2__WEBPACK_IMPORTED_MODULE_1__[&quot;default&quot;]);
+    __webpack_exports__[&quot;default&quot;] &#x3D; (&#39;.&#x2F;main.js&#39;);
+&#125;)</code></pre><p>我们可以看到入口模块又调用了<code>__webpack_require__(&quot;./src/index1.js&quot;)</code>和<code>__webpack_require__(&quot;./src/index2.js&quot;)</code>去引用入参数组里的第2和第3个函数。</p><p>然后会将入参的<code>__webpack_exports__</code>对象添加<code>default</code>属性，并赋值。这里的<code>__webpack_exports__</code>就是这个模块的<code>module.exports</code>通过对象的引用传参，间接的给<code>module.exports</code>添加属性，这就是webpack模块化的实现原理。</p><p>最后会将<code>module.exports return</code>出来。就完成了<code>__webpack_require__</code>函数的使命。比如在入口模块中又调用了<code>__webpack_require__(&quot;./src/index1.js&quot;)</code>，就会得到这个模块返回的<code>module.exports</code>。</p><h2 id="babel-的作用"><a href="#babel-的作用" class="headerlink" title="babel 的作用"></a>babel 的作用</h2><p>按理说 webpack 的模块化方案已经很好的将 es6 模块化转换成 webpack 的模块化，但是其余的 es6 语法还需要做兼容性处理。babel 专门用于处理 es6 转换 es5。当然这也包括 es6 的模块语法的转换。<br>其实两者的转换思路差不多，区别在于 webpack 的原生转换 可以多做一步静态分析，使用tree-shaking 技术。</p><blockquote><p>babel 能提前将 es6 的 import 等模块关键字转换成 commonjs 的规范。这样 webpack 就无需再做处理，直接使用 webpack 运行时定义的 <strong>webpack_require</strong> 处理。</p></blockquote><h3 id="导出模块"><a href="#导出模块" class="headerlink" title="导出模块"></a>导出模块</h3><p>es6 的导出模块写法：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">export default 123;
+
+export const a &#x3D; 123;
+
+const b &#x3D; 3;
+const c &#x3D; 4;
+export &#123; b, c &#125;;</code></pre><p>babel 会将这些统统转换成 commonjs 的 exports：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">exports.default &#x3D; 123;
+exports.a &#x3D; 123;
+exports.b &#x3D; 3;
+exports.c &#x3D; 4;
+exports.__esModule &#x3D; true;</code></pre><p>babel 转换 es6 的模块输出逻辑非常简单，即将所有输出都赋值给 exports，并带上一个标志 __esModule 表明这是个由 es6 转换来的 commonjs 输出。</p><p>babel将模块的导出转换为commonjs规范后，也会将引入 import 也转换为 commonjs 规范。即采用 require 去引用模块，再加以一定的处理，符合es6的使用意图。</p><h3 id="引入-default"><a href="#引入-default" class="headerlink" title="引入 default"></a>引入 default</h3><pre class="line-numbers language-js" data-language="js"><code class="language-js">import a from &#39;.&#x2F;a.js&#39;;</code></pre><p>在es6中 import a from ‘./a.js’ 的本意是想去引入一个 es6 模块中的 default 输出。</p><p>通过babel转换后得到<code>var a = require(./a.js)</code>，require得到的对象却是整个对象，肯定不是 es6 语句的本意，所以需要对 a 做些改变。</p><p>我们在导出提到，default 输出会赋值给导出对象的default属性。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">exports.default &#x3D; 123;</code></pre><p>所以 babel 加了个<code>help _interopRequireDefault</code>函数：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">function _interopRequireDefault(obj) &#123;
+    return obj &amp;&amp; obj.__esModule
+        ? obj
+        : &#123; &#39;default&#39;: obj &#125;;
+&#125;
+
+var _a &#x3D; require(&#39;assert&#39;);
+var _a2 &#x3D; _interopRequireDefault(_a);
+
+var a &#x3D; _a2[&#39;default&#39;];</code></pre><p>所以这里最后的 a 变量就是 require 的值的 default 属性。如果原先就是commonjs规范的模块，那么就是那个模块的导出对象。</p><h3 id="引入-通配符"><a href="#引入-通配符" class="headerlink" title="引入 * 通配符"></a>引入 * 通配符</h3><p>我们使用<code>import * as a from &#39;./a.js&#39;</code>es6语法的本意是想将 es6 模块的所有命名输出以及defalut输出打包成一个对象赋值给a变量。</p><p>已知以 commonjs 规范导出：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">exports.default &#x3D; 123;
+exports.a &#x3D; 123;
+exports.b &#x3D; 3;
+exports.__esModule &#x3D; true;</code></pre><p>那么对于 es6 转换来的输出通过 var a = require(‘./a.js’) 导入这个对象就已经符合意图。</p><p>所以直接返回这个对象：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">if (obj &amp;&amp; obj.__esModule) &#123;
+   return obj;
+&#125;</code></pre><p>如果本来就是 commonjs 规范的模块，导出时没有default属性，需要添加一个default属性，并把整个模块对象再次赋值给default属性：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">function _interopRequireWildcard(obj) &#123;
+    if (obj &amp;&amp; obj.__esModule) &#123;
+        return obj;
+    &#125;
+    else &#123;
+        var newObj &#x3D; &#123;&#125;; &#x2F;&#x2F; (A)
+        if (obj !&#x3D; null) &#123;
+            for (var key in obj) &#123;
+                if (Object.prototype.hasOwnProperty.call(obj, key))
+                    newObj[key] &#x3D; obj[key];
+            &#125;
+        &#125;
+        newObj.default &#x3D; obj;
+        return newObj;
+    &#125;
+&#125;
+</code></pre><h3 id="import-a-from-‘-a-js’"><a href="#import-a-from-‘-a-js’" class="headerlink" title="import { a } from ‘./a.js’"></a>import { a } from ‘./a.js’</h3><p>直接转换成 require(‘./a.js’).a 即可。</p><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>经过上面的转换分析，我们得知即使我们使用了 es6 的模块系统，如果借助 babel 的转换，es6 的模块系统最终还是会转换成 commonjs 的规范。所以我们如果是使用 babel 转换 es6 模块，混合使用 es6 的模块和 commonjs 的规范是没有问题的，因为最终都会转换成 commonjs。</p><h2 id="babel5-amp-babel6"><a href="#babel5-amp-babel6" class="headerlink" title="babel5 &amp; babel6"></a>babel5 &amp; babel6</h2><p>我们在上文 babel 对导出模块的转换提到，es6 的 export default 都会被转换成 exports.default，即使这个模块只有这一个输出。</p><p>我们经常会使用 es6 的 export default 来输出模块，而且这个输出是这个模块的唯一输出，我们会误以为这种写法输出的是模块的默认输出。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; a.js
+export default 123;</code></pre><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; b.js 错误
+
+var foo &#x3D; require(&#39;.&#x2F;a.js&#39;)</code></pre><p>在使用<code>require</code>进行引用时，我们也会误以为引入的是a文件的默认输出。结果这里需要改成<code>var foo = require(&#39;./a.js&#39;).default</code>。</p><p>这个场景在写 webpack 代码分割逻辑时经常会遇到。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">require.ensure([], (require) &#x3D;&gt; &#123;
+   callback(null, [
+     require(&#39;.&#x2F;src&#x2F;pages&#x2F;profitList&#39;).default,
+   ]);
+&#125;);</code></pre><p>这是 babel6 的变更，在 babel5 的时候可不是这样的。</p><p><img src="/images/module-import-require/img1.jpeg" alt="img1.jpeg"></p><p>在 babel5 时代，大部分人在用 require 去引用 es6 输出的 default，只是把 default 输出看作是一个模块的默认输出，所以 babel5 对这个逻辑做了 hack，如果一个 es6 模块只有一个 default 输出，那么在转换成 commonjs 的时候也一起赋值给 module.exports，即整个导出对象被赋值了 default 所对应的值。</p><p>这样就不需要加 default，require(‘./a.js’) 的值就是想要的 default值。但这样做是不符合 es6 的定义的，在es6 的定义里，default 只是个名字，没有任何意义。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">export default &#x3D; 123;
+export const a &#x3D; 123;</code></pre><p>这两者含义是一样的，分别为输出名为 default 和 a 的变量。</p><p>还有一个很重要的问题，一旦 a.js 文件里又添加了一个具名的输出，那么引入方就会出麻烦。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">&#x2F;&#x2F; a.js
+export default 123;
+
+export const a &#x3D; 123; &#x2F;&#x2F; 新增
+
+&#x2F;&#x2F; b.js 
+var foo &#x3D; require(&#39;.&#x2F;a.js&#39;);
+
+&#x2F;&#x2F; 由之前的 输出 123
+&#x2F;&#x2F; 变成 &#123; default: 123, a: 123 &#125;</code></pre><p>所以 babel6 去掉了这个hack，这是个正确的决定，升级 babel6 后产生的不兼容问题 可以通过引入<a target="_blank" rel="noopener external nofollow noreferrer" href="https://www.npmjs.com/package/babel-plugin-add-module-exports">babel-plugin-add-module-exports</a>解决。</p></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/07/7718.html" class="pre-post btn btn-default" title="JAVA_HOME环境变量失效的解决办法"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">JAVA_HOME环境变量失效的解决办法</span> </a><a href="/blog/2018/07/37970.html" class="next-post btn btn-default" title="netlify 入门教程"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">netlify 入门教程</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

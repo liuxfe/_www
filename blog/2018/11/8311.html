@@ -1,0 +1,313 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="Java"><meta name="description" content="新特性列表以下是Java5中的引入的部分新特性，关于更详细的新特性了解，可参考这里。
+
+泛型(Generics)
+增强for循环(Enhanced for Loop)
+自动装箱拆箱(Autobo..."><title>Java5新特性及使用 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="Java5新特性及使用">Java5新特性及使用</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/%E5%90%8E%E7%AB%AF/">后端</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/Java/" rel="tag">Java</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/11/09</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 939</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="新特性列表"><a href="#新特性列表" class="headerlink" title="新特性列表"></a>新特性列表</h2><p>以下是Java5中的引入的部分新特性，关于更详细的新特性了解，可参考<a target="_blank" rel="noopener external nofollow noreferrer" href="https://docs.oracle.com/javase/1.5.0/docs/relnotes/features.html">这里</a>。</p><ul><li>泛型(Generics)</li><li>增强for循环(Enhanced for Loop)</li><li>自动装箱拆箱(Autoboxing/Unboxing)</li><li>枚举(Enums)</li><li>可变参数(Varargs)</li><li>静态导入(Static Import)</li><li>注解(Annotations)</li><li>值得关注<ul><li>进程构建器(ProcessBuilder)</li><li>格式化(Formatter)</li><li>扫描器(Scanner)</li><li>反射(Reflection)</li><li>集合框架(Collections Framework)</li><li>并发工具类(Concurrency Utilities)</li><li>StringBuilder</li></ul></li><li>其它(others)</li></ul><h2 id="一、泛型-Generics"><a href="#一、泛型-Generics" class="headerlink" title="一、泛型(Generics)"></a>一、泛型(Generics)</h2><h3 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h3><p>Java语言引入泛型的好处是安全简单。可以将运行时错误提前到编译时错误。在Java5之前，没有泛型的情况的下，通过对类型Object的引用来实现参数的<strong>任意化</strong>，<strong>任意化</strong>带来的缺点是要做显式的强制类型转换，而这种转换是要求开发者对实际参数类型可以预知的情况下进行的。对于强制类型转换错误的情况，编译器可能不提示错误，在运行的时候才出现异常，这是一个安全隐患。泛型的好处是在编译的时候检查类型安全，并且所有的强制转换都是自动和隐式的，提高代码的重用率。</p><p>泛型的本质是<strong>参数化类型</strong>，也就是说所操作的数据类型被指定为一个参数。这种参数类型可以用在类、接口和方法中，分别称为泛型类、泛型接口、泛型方法。</p><h3 id="2-泛型类、泛型接口"><a href="#2-泛型类、泛型接口" class="headerlink" title="2. 泛型类、泛型接口"></a>2. 泛型类、泛型接口</h3><p>泛型类中的类型参数几乎可以用于任何可以使用接口名、类名的地方。以下是Jdk中Map接口的定义：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public interface Map&lt;K,V&gt; &#123;
+
+    V get(Object key);
+
+    V put(K key, V value);
+
+&#125;</code></pre><p>当声明或者实例化一个泛型的对象时，必须指定类型参数的值：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Map&lt;Integer, String&gt; map &#x3D; new HashMap&lt;Integer, String&gt;();</code></pre><p>对于常见的泛型模式，推荐的名称是：</p><ul><li>K: 键</li><li>V: 值</li><li>E: 异常类</li><li>T: 泛型</li></ul><h3 id="3-泛型方法"><a href="#3-泛型方法" class="headerlink" title="3. 泛型方法"></a>3. 泛型方法</h3><h4 id="1-定义泛型方法"><a href="#1-定义泛型方法" class="headerlink" title="(1). 定义泛型方法"></a>(1). 定义泛型方法</h4><p>泛型方法使得该方法能独立于类而产生变化。以下是一个基本的指导原则：<strong>无论何时，只要你能做到，你就应该尽量使用泛型方法</strong>。也就是说，如果使用泛型方法可以取代将整个类泛型化，那么就应该只使用泛型方法，因为它可以使事情更清楚明白。要定义泛型方法，只需<strong>将泛型参数列表置于返回值之前</strong>，就像下面这样：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class GenericMethods &#123;
+
+    &#x2F;&#x2F;当方法操作的引用数据类型不确定的时候，可以将泛型定义在方法上
+    public &lt;T&gt; void f(T x)&#123;
+        System.out.println(x.getClass().getName());
+    &#125;
+
+    public static void main(String[] args) &#123;
+        GenericMethods gm &#x3D; new GenericMethods();
+        gm.f(99);
+        gm.f(&quot;abc&quot;);
+    &#125;
+
+&#125;</code></pre><h4 id="2-可变参数泛型方法"><a href="#2-可变参数泛型方法" class="headerlink" title="(2). 可变参数泛型方法"></a>(2). 可变参数泛型方法</h4><p>泛型方法与可变参数列表能很好地共存。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class GenericVarargs &#123;
+
+    public static &lt;T&gt; List&lt;T&gt; makeList(T... args) &#123;
+        List&lt;T&gt; result &#x3D; new ArrayList&lt;T&gt;();
+        for(T item:args) &#123;
+            result.add(item);
+        &#125;
+        return result;
+    &#125;
+
+    public static void main(String[] args) &#123;
+        List ls &#x3D; makeList(&quot;A&quot;);
+        System.out.println(ls);
+        ls &#x3D; makeList(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;);
+        System.out.println(ls);
+        ls &#x3D; makeList(&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;.split(&quot;&quot;));
+        System.out.println(ls);
+    &#125;
+
+&#125;</code></pre><blockquote><p><strong>注</strong>：静态方法无法访问类上定义的泛型。如果静态方法操作的引用数据类型不确定的时候，必须要将泛型定义在方法上。</p></blockquote><h3 id="4-泛型擦除"><a href="#4-泛型擦除" class="headerlink" title="4. 泛型擦除"></a>4. 泛型擦除</h3><p>看以下一段代码：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class ErasedTypeEquivalence &#123;
+
+    public static void main(String[] args) &#123;
+        Class c1 &#x3D; new ArrayList&lt;String&gt;().getClass();
+        Class c2 &#x3D; new ArrayList&lt;Integer&gt;().getClass();
+        System.out.println(c1 &#x3D;&#x3D; c2); &#x2F;&#x2F; 输出true.
+    &#125;
+
+&#125;</code></pre><p>从以上代码的执行结果可以知道，<code>ArrayList&lt;String&gt;</code>和<code>ArrayList&lt;Integer&gt;</code>是相同的类型。Java中的泛型，只在编译阶段有效。在编译过程中，正确检验泛型结果后，会将泛型的相关信息擦出，并且在对象进入和离开方法的边界处添加类型检查和类型转换的方法。也就是说，成功编译过后的class文件中是不包含任何泛型信息的。泛型信息不会进入到运行时阶段。</p><p>要想在表达式中使用类型，需要显式地传递类型的class对象。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">class Building &#123;
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">class House extends Building &#123;
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class ClassTypeCapture&lt;T&gt; &#123;
+
+    Class&lt;T&gt; kind;
+
+    public ClassTypeCapture(Class&lt;T&gt; kind) &#123;
+        this.kind &#x3D; kind;
+    &#125;
+
+    public boolean f(Object arg) &#123;
+        return kind.isInstance(arg);
+    &#125;
+
+    public static void main(String[] args) &#123;
+        ClassTypeCapture&lt;Building&gt; ctt1 &#x3D; new ClassTypeCapture&lt;Building&gt;(Building.class);
+        System.out.println(ctt1.f(new Building())); &#x2F;&#x2F; true
+        System.out.println(ctt1.f(new House())); &#x2F;&#x2F; true
+        ClassTypeCapture&lt;House&gt; ctt2 &#x3D; new ClassTypeCapture&lt;House&gt;(House.class);
+        System.out.println(ctt2.f(new Building())); &#x2F;&#x2F; false
+        System.out.println(ctt2.f(new House())); &#x2F;&#x2F; true
+    &#125;
+&#125;</code></pre><h3 id="5-通配符及泛型边界"><a href="#5-通配符及泛型边界" class="headerlink" title="5. 通配符及泛型边界"></a>5. 通配符及泛型边界</h3><ul><li>通配符(<code>?</code>): 当操作类型时，不需要使用类型的具体功能时，只使用<code>Object</code>类中的功能。那么可以用<code>?</code>通配符来表未知类型。例如：<code>Class&lt;?&gt; classType = Class.forName(&quot;java.lang.String&quot;);</code>。</li><li>上界(<code>? extends T</code>): 可以接收<code>T</code>类型或者其子类型的对象。</li><li>下界(<code>? super E</code>): 可以接收<code>T</code>类型或者其父类型的对象。</li></ul><h3 id="6-泛型总结"><a href="#6-泛型总结" class="headerlink" title="6. 泛型总结"></a>6. 泛型总结</h3><ul><li>泛型的类型参数只能是类类型，不能是基本数据类型。</li><li>泛型的类型参数可以有多个。</li><li>所有泛型类的类型参数在编译时都会被擦除。</li><li>创建泛型对象时请指明类型，让编译器尽早的做参数检查。</li><li>不能创建泛型数组。如果想要创建泛型数组，建议使用<code>ArrayList</code>。</li><li>使用带泛型的类创建对象时，等式两边指定的泛型必须一致。</li><li>泛型的好处：<ul><li>类型安全。</li><li>消除强制类型转换。</li><li>提高性能。</li></ul></li></ul><h2 id="二、增强for循环-Enhanced-for-Loop"><a href="#二、增强for循环-Enhanced-for-Loop" class="headerlink" title="二、增强for循环(Enhanced for Loop)"></a>二、增强for循环(Enhanced for Loop)</h2><p>在Java5中，引入了另一种形式的for循环来对集合、数组、Map等进行遍历。如以下示例：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">int[] integers &#x3D; &#123;1, 2, 3, 4&#125;;
+&#x2F;* 开始遍历 *&#x2F;
+for (int i : integers) &#123;
+    System.out.println(i);&#x2F;* 依次输出“1”、“2”、“3”、“4” *&#x2F;
+&#125;</code></pre><p>借助增强for循环，可以用一种更简单地方式来完成遍历。能用这种方法遍历的对象的类型，可以是数组、<code>Collection</code>、<code>Map</code>或者任何其它实现了<code>java.lang.Iterable</code>接口的类。通过跟同样是在Java5中引入的泛型机制配合使用，可以精确的控制能采用的循环变量的类型。而且，因为这么编写的代码，会在编译期间被自动当成是和传统写法相同的形式，所以不必担心要额外付出性能方面的代价。</p><blockquote><p><strong>注</strong>：Java采用<code>for</code>（而不是意义更明确的<code>foreach</code>）来引导这种一般被叫做<strong>for-each循环</strong>的循环，并使用<code>:</code>（而不是意义更明确的<code>in</code>）来分割循环变量名称和要被遍历的对象。这样做的主要原因，是为了避免因为引入新的关键字，造成兼容性方面的问题——在Java语言中，不允许把关键字当作变量名来使用，虽然使用<code>foreach</code>这名字的情况并不是非常多，但是<code>in</code>却是一个经常用来表示输入流的名字（例如<code>java.lang.System</code>类里，就有一个名字叫做<code>in</code>的<code>static</code>属性，表示<strong>标准输入流</strong>）。</p></blockquote><h2 id="三、自动装箱拆箱-Autoboxing-Unboxing"><a href="#三、自动装箱拆箱-Autoboxing-Unboxing" class="headerlink" title="三、自动装箱拆箱(Autoboxing/Unboxing)"></a>三、自动装箱拆箱(Autoboxing/Unboxing)</h2><h3 id="1-概述-1"><a href="#1-概述-1" class="headerlink" title="1. 概述"></a>1. 概述</h3><p>自动装箱就是Java自动将原始类型值转换成对应的对象，比如将<code>int</code>的变量转换成<code>Integer</code>对象，这个过程叫做装箱，反之将<code>Integer</code>对象转换成<code>int</code>类型值，这个过程叫做拆箱。因为这里的装箱和拆箱是自动进行的非人为转换，所以就称作为自动装箱和拆箱。原始类型<code>byte</code>, <code>short</code>, <code>char</code>, <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>和<code>boolean</code>对应的封装类分别为<code>Byte</code>, <code>Short</code>, <code>Character</code>, <code>Integer</code>, <code>Long</code>, <code>Float</code>, <code>Double</code>, <code>Boolean</code>。</p><p>自动装箱时编译器调用<code>valueOf</code>将原始类型值转换成对象，同时自动拆箱时，编译器通过调用类似<code>intValue()</code>, <code>doubleValue()</code>这类的方法将对象转换成原始类型值。自动装箱和拆箱在Java中很常见，比如我们有一个方法，接受一个对象类型的参数，如果我们传递一个原始类型值，那么Java会自动将这个原始类型值转换成与之对应的对象。最经典的一个场景就是当我们向<code>ArrayList</code>这样的容器中增加原始类型数据时，就会发生自动装箱。代码示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">ArrayList&lt;Integer&gt; intList &#x3D; new ArrayList&lt;Integer&gt;();
+intList.add(1); &#x2F;&#x2F;自动装箱
+intList.add(2); &#x2F;&#x2F; 自动装箱
+
+int number &#x3D; intList.get(0); &#x2F;&#x2F; 自动拆箱</code></pre><h3 id="2-对象相等的比较"><a href="#2-对象相等的比较" class="headerlink" title="2. 对象相等的比较"></a>2. 对象相等的比较</h3><p>这是一个比较容易出错的地方，<code>==</code>可以用于原始值进行比较，也可以用于对象进行比较，当用于对象与对象之间比较时，比较的不是对象代表的值，而是检查两个对象是否是同一对象，这个比较过程中<strong>没有自动装箱</strong>发生。进行对象值比较不应该使用<code>==</code>，而应该使用对象对应的<code>equals</code>方法。看一个能说明问题的例子。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class AutoboxingTest &#123;
+
+    public static void main(String args[]) &#123;
+        &#x2F;&#x2F; 示例 1: 使用&#39;&#x3D;&#x3D;&#39;号进行原始类型的比较(没有自动装箱)
+        int i1 &#x3D; 1;
+        int i2 &#x3D; 1;
+        System.out.println(&quot;i1&#x3D;&#x3D;i2 : &quot; + (i1 &#x3D;&#x3D; i2)); &#x2F;&#x2F; true
+
+        &#x2F;&#x2F; 示例 2: 使用&#39;&#x3D;&#x3D;&#39;号进行原始类型和对象类型混合的比较(自动装箱)
+        Integer num1 &#x3D; 1;
+        int num2 &#x3D; 1;
+        System.out.println(&quot;num1 &#x3D;&#x3D; num2 : &quot; + (num1 &#x3D;&#x3D; num2)); &#x2F;&#x2F; true
+
+        &#x2F;&#x2F; 示例 3: 使用&#39;&#x3D;&#x3D;&#39;号进行Integer对象类型的比较(会有缓存的特殊情况)
+        Integer obj1 &#x3D; 127; &#x2F;&#x2F; 自动装箱将调用&#96;Integer.valueOf()&#96;且缓存该对象，以便重用
+        Integer obj2 &#x3D; 127; &#x2F;&#x2F; 获取已经缓存过的对象
+        System.out.println(&quot;obj1 &#x3D;&#x3D; obj2 : &quot; + (obj1 &#x3D;&#x3D; obj2)); &#x2F;&#x2F; true
+
+       &#x2F;&#x2F; 示例 4: 使用&#39;&#x3D;&#x3D;&#39;号进行Integer对象类型的比较(不会缓存)
+        Integer obj3 &#x3D; 128; &#x2F;&#x2F; 自动装箱将调用&#96;Integer.valueOf()&#96;不缓存该对象
+        Integer obj4 &#x3D; 128; &#x2F;&#x2F; 同样是自动装箱将调用&#96;Integer.valueOf()&#96;
+        System.out.println(&quot;obj3 &#x3D;&#x3D; obj4 : &quot; + (obj3 &#x3D;&#x3D; obj4)); &#x2F;&#x2F; false
+
+        &#x2F;&#x2F; 示例 5: 使用&#39;&#x3D;&#x3D;&#39;号进行&#96;new&#96;出来的新&#96;Integer&#96;对象类型的比较
+        Integer one &#x3D; new Integer(1); &#x2F;&#x2F; no autoboxing
+        Integer anotherOne &#x3D; new Integer(1);
+        System.out.println(&quot;one &#x3D;&#x3D; anotherOne : &quot; + (one &#x3D;&#x3D; anotherOne)); &#x2F;&#x2F; false
+    &#125;
+
+&#125;</code></pre><h3 id="3-缓存部分对象"><a href="#3-缓存部分对象" class="headerlink" title="3. 缓存部分对象"></a>3. 缓存部分对象</h3><p>输出结果：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">i1&#x3D;&#x3D;i2 : true
+num1 &#x3D;&#x3D; num2 : true
+obj1 &#x3D;&#x3D; obj2 : true
+obj3 &#x3D;&#x3D; obj4 : false
+one &#x3D;&#x3D; anotherOne : false</code></pre><p>在 Java5 中，为<code>Integer</code>的操作引入了一个新的特性，会对<code>-128</code>到<code>127</code>的<code>Integer</code>对象进行缓存，当创建新的<code>Integer</code>对象时，如果符合这个这个范围，并且已有存在的相同值的对象，则返回这个对象，否则创建新的<code>Integer</code>对象。这种<code>Integer</code>缓存策略仅在<strong>自动装箱（autoboxing）</strong>的时候有用，使用构造器创建的<code>Integer</code>对象不能被缓存。</p><p><code>Integer</code>类中有一个专门的私有静态内部类<code>IntegerCache</code>来负责<code>Integer</code>的缓存。代码如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * Cache to support the object identity semantics of autoboxing for values between
+ * -128 and 127 (inclusive) as required by JLS.
+ *
+ * The cache is initialized on first usage.  The size of the cache
+ * may be controlled by the &#123;@code -XX:AutoBoxCacheMax&#x3D;&lt;size&gt;&#125; option.
+ * During VM initialization, java.lang.Integer.IntegerCache.high property
+ * may be set and saved in the private system properties in the
+ * sun.misc.VM class.
+ *&#x2F;
+private static class IntegerCache &#123;
+    static final int low &#x3D; -128;
+    static final int high;
+    static final Integer cache[];
+
+    static &#123;
+        &#x2F;&#x2F; high value may be configured by property
+        int h &#x3D; 127;
+        String integerCacheHighPropValue &#x3D;
+            sun.misc.VM.getSavedProperty(&quot;java.lang.Integer.IntegerCache.high&quot;);
+        if (integerCacheHighPropValue !&#x3D; null) &#123;
+            try &#123;
+                int i &#x3D; parseInt(integerCacheHighPropValue);
+                i &#x3D; Math.max(i, 127);
+                &#x2F;&#x2F; Maximum array size is Integer.MAX_VALUE
+                h &#x3D; Math.min(i, Integer.MAX_VALUE - (-low) -1);
+            &#125; catch( NumberFormatException nfe) &#123;
+                &#x2F;&#x2F; If the property cannot be parsed into an int, ignore it.
+            &#125;
+        &#125;
+        high &#x3D; h;
+
+        cache &#x3D; new Integer[(high - low) + 1];
+        int j &#x3D; low;
+        for(int k &#x3D; 0; k &lt; cache.length; k++)
+            cache[k] &#x3D; new Integer(j++);
+
+        &#x2F;&#x2F; range [-128, 127] must be interned (JLS7 5.1.7)
+        assert IntegerCache.high &gt;&#x3D; 127;
+    &#125;
+
+    private IntegerCache() &#123;&#125;
+&#125;</code></pre><p>Javadoc详细的说明这个类是用来实现缓存支持，并支持<code>-128</code>到<code>127</code>之间的自动装箱过程。最大值<code>127</code>可以通过JVM的启动参数<code>-XX:AutoBoxCacheMax=size</code>修改。 缓存通过一个<code>for</code>循环实现。从小到大的创建尽可能多的整数并存储在一个名为<code>cache</code>的整数数组中。这个缓存会在<code>Integer</code>类第一次被使用的时候被初始化出来。以后，就可以使用缓存中包含的实例对象，而不是创建一个新的实例(在自动装箱的情况下)。</p><p>这种缓存行为不仅适用于<code>Integer</code>对象。我们针对所有整数类型的类都有类似的缓存机制。</p><ul><li><code>ByteCache</code>用于缓存<code>Byte</code>对象</li><li><code>ShortCache</code>用于缓存<code>Short</code>对象</li><li><code>LongCache</code>用于缓存<code>Long</code>对象</li><li><code>CharacterCache</code>用于缓存<code>Character</code>对象</li></ul><p><code>Byte</code>，<code>Short</code>，<code>Long</code>有固定范围:<code>-128</code>到<code>127</code>。对于<code>Character</code>, 范围是<code>0</code>到<code>127</code>。除了<code>Integer</code>可以通过参数改变范围外，其它的都不行。</p><blockquote><p><strong>注</strong>：在Java中另一个节省内存的例子就是<strong>字符串常量池</strong>。</p></blockquote><h3 id="4-自动装箱拆箱的隐患"><a href="#4-自动装箱拆箱的隐患" class="headerlink" title="4. 自动装箱拆箱的隐患"></a>4. 自动装箱拆箱的隐患</h3><p>另一个需要避免的问题就是混乱使用对象和原始数据值，一个具体的例子就是当我们在一个原始数据值与一个对象进行比较时，如果这个对象没有进行初始化或者为<code>null</code>，在自动拆箱过程中<code>obj.xxxValue</code>，会抛出<code>NullPointerException</code>，如下面的代码:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">private static Integer count;
+
+&#x2F;&#x2F;NullPointerException on unboxing
+if (count &lt;&#x3D; 0) &#123;
+    System.out.println(&quot;Count is not started yet&quot;);
+&#125;</code></pre><p>因为自动装箱会隐式地创建对象，像前面提到的那样，如果在一个循环体中，会创建无用的中间对象，这样会增加GC压力，拉低程序的性能。所以在写循环时一定要注意代码，避免引入不必要的自动装箱操作。</p><h2 id="四、枚举-Enums"><a href="#四、枚举-Enums" class="headerlink" title="四、枚举(Enums)"></a>四、枚举(Enums)</h2><p>枚举（<code>enum</code>全称为<code>enumeration</code>）类型是 Java5 新增的类型，存放在<code>java.lang</code>包中，允许用常量来表示特定的数据片断，而且全部都以类型安全的形式来表示。</p><p>关于枚举的介绍，这里就不再细讲了，请参考我以前所整理的<a target="_blank" rel="noopener external nofollow noreferrer" href="http://blinkfox.com/java-mei-ju-zhi-shi-zheng-li/">Java 枚举知识整理</a>一文。</p><h2 id="五、可变参数-Varargs"><a href="#五、可变参数-Varargs" class="headerlink" title="五、可变参数(Varargs)"></a>五、可变参数(Varargs)</h2><h3 id="1-基本使用"><a href="#1-基本使用" class="headerlink" title="1. 基本使用"></a>1. 基本使用</h3><p>在 Java5 中提供了可变参数（<code>Varargs</code>），也就是在方法定义中可以使用个数不确定的参数，对于同一方法可以使用不同个数的参数调用，例如<code>print(&quot;hello&quot;);</code>、<code>print(&quot;hello&quot;,&quot;lisi&quot;);</code>等。下面介绍如何定义可变长参数以及如何使用可变长参数。</p><p>使用<code>...</code>表示可变长参数，例如：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">print(String... args) &#123;
+   &#x2F;&#x2F; 方法代码
+&#125;</code></pre><p>在具有可变长参数的方法中可以把参数当成数组使用，例如可以循环输出所有的参数值。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">print(String... args) &#123;
+    for(String temp:args) &#123;
+        System.out.println(temp);
+    &#125;
+&#125;</code></pre><p>调用的时候可以给出任意多个参数也可不给参数，例如：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">print();
+print(&quot;hello&quot;);
+print(&quot;hello&quot;,&quot;lisi&quot;);</code></pre><h3 id="2-可变参数的使用规则"><a href="#2-可变参数的使用规则" class="headerlink" title="2. 可变参数的使用规则"></a>2. 可变参数的使用规则</h3><ul><li>拥有可变参数的方法可以被重载，在调用方法的时候，如果能够和固定参数的方法匹配，也能够与可变参数的方法匹配，则执行时会选择固定参数的方法。</li><li>如果要调用的方法可以和两个可变参数匹配，则编译不会通过。</li><li>一个方法只能有一个可变参数，并且这个可变参数必须是该方法的最后一个参数。</li><li>可变参数可以兼容数组参数，但数组参数无法兼容可变参数。即在方法中定义可变参数后，我们可以像操作数组一样操作该参数；</li></ul><h3 id="3-可变参数的使用规范"><a href="#3-可变参数的使用规范" class="headerlink" title="3. 可变参数的使用规范"></a>3. 可变参数的使用规范</h3><ul><li>避免带有可变参数的方法重载，容易让人陷入调用的陷阱及误区。</li><li>别让<code>null</code>值和空值威胁到可变参数的方法。</li><li>覆写可变参数方法也要满足以下的条件:<ul><li>重写方法不能缩小访问权限。</li><li>参数列表必须与被重写方法相同（包括显示形式）。</li><li>返回类型必须与被重写方法的相同或是其子类。</li><li>重写方法不能抛出新的异常，或者超过了父类范围的异常，但是可以抛出更少、更有限的异常，或者不抛出异常。</li></ul></li></ul><h2 id="六、静态导入-Static-Import"><a href="#六、静态导入-Static-Import" class="headerlink" title="六、静态导入(Static Import)"></a>六、静态导入(Static Import)</h2><p><code>import static</code>，即静态导入是JDK5中的新特性。一般我们导入一个类都用<code>import com.xxx.ClassName;</code>，而静态导入是这样的：<code>import static com.xxx.ClassName.*;</code>。这里多了个<code>static</code>，还有就是类名<code>ClassName</code>后面多了个<code>.*</code>，意思是导入这个类里的所有静态方法。当然，也可以只导入某个静态方法，只要把<code>.*</code>换成具体的静态方法名就行了。然后在这个类中，就可以直接用方法名调用静态方法，而不必用<code>ClassName.方法名</code>的方式来调用。</p><p>静态导入之前的代码：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">double r &#x3D; Math.cos(Math.PI * theta);</code></pre><p>使用静态导入之后的代码：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">import static java.lang.Math.*;
+
+double r &#x3D; cos(PI * theta);</code></pre><p><strong>当你需要频繁访问一个或两个类的静态成员、静态方法时才使用静态导入</strong>。如果您过度的使用了静态导入功能，则可能导致您的程序无法读取且无法维护，从而导致您导入的所有静态成员和方法污染其名称空间。你的代码读者（包括你，在你写了几个月后）不会知道静态成员来自哪个类。从类中导入所有静态成员对可读性尤其有害，如果您只需要一个或两个成员，请单独导入它们。使用适当的，静态导入可以使您的程序更具可读性，通过删除重复的类名称，来减少样板代码。</p><h2 id="七、注解-Annotations"><a href="#七、注解-Annotations" class="headerlink" title="七、注解(Annotations)"></a>七、注解(Annotations)</h2><p>关于注解的介绍，这里就不再细讲了，请参考我前段时间所写的<a target="_blank" rel="noopener external nofollow noreferrer" href="http://blinkfox.com/javazhu-jie-de-li-jie-he-ying-yong/">Java注解的理解和应用</a>一文。</p><h2 id="八、值得关注"><a href="#八、值得关注" class="headerlink" title="八、值得关注"></a>八、值得关注</h2><h3 id="1-新增ProcessBuilder类"><a href="#1-新增ProcessBuilder类" class="headerlink" title="1. 新增ProcessBuilder类"></a>1. 新增ProcessBuilder类</h3><p><code>ProcessBuilder</code>类是Java5在<code>java.lang</code>包中新添加的一个新类，此类用于创建操作系统进程，它提供一种启动和管理进程（也就是应用程序）的方法。在此之前，都是由<code>Process</code>类处来实现进程的控制管理。每个<code>ProcessBuilder</code>实例管理一个进程属性集。它的<code>start()</code>方法利用这些属性创建一个新的<code>Process</code>实例。<code>start()</code>方法可以从同一实例重复调用，以利用相同的或相关的属性创建新的子进程。</p><p><code>ProcessBuilder</code>是一个<code>final</code>类，有两个带参数的构造方法，你可以通过构造方法来直接创建<code>ProcessBuilder</code>的对象。而<code>Process</code>是一个抽象类，一般都通过<code>Runtime.exec()</code>和<code>ProcessBuilder.start()</code>来间接创建其实例。<code>ProcessBuilder</code>为进程提供了更多的控制，例如，可以设置当前工作目录，还可以改变环境参数。而<code>Process</code>类的功能相对来说简单的多。<code>ProcessBuilder</code>类不是同步的。如果多个线程同时访问一个<code>ProcessBuilder</code>，而其中至少一个线程从结构上修改了其中一个属性，它必须保持外部同步。</p><p>若要使用<code>ProcessBuilder</code>创建一个进程，只需要创建<code>ProcessBuilder</code>的一个实例，指定该进程的名称和所需参数。要执行此程序，调用该实例上的<code>start()</code>即可。下面是一个执行打开<code>Windows</code>记事本的例子。注意它将要编辑的文件名指定为一个参数。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">class PBDemo &#123;
+
+    public static void main(String args[]) &#123;
+        try &#123;
+            ProcessBuilder proc &#x3D; new ProcessBuilder(&quot;notepad.exe&quot;, &quot;testfile&quot;);
+            proc.start();
+        &#125; catch (Exception e) &#123;
+            System.out.println(&quot;Error executing notepad.&quot;);
+        &#125;
+    &#125;
+
+&#125;</code></pre><h3 id="2-新增Formatter格式化器-Formatter"><a href="#2-新增Formatter格式化器-Formatter" class="headerlink" title="2. 新增Formatter格式化器(Formatter)"></a>2. 新增Formatter格式化器(Formatter)</h3><p><code>Formatter</code>类是Java5中新增的<code>printf-style</code>格式化字符串的解释器，它提供对布局和对齐的支持，提供了对数字，字符串和日期/时间数据的常用格式以及特定于语言环境的输出。常见的Java类型，如<code>byte</code>，<code>java.math.BigDecimal</code>和<code>java.util.Calendar</code>都支持。 通过<code>java.util.Formattable</code>接口提供了针对任意用户类型的有限格式定制。</p><p>更详细的介绍见<a target="_blank" rel="noopener external nofollow noreferrer" href="https://docs.oracle.com/javase/1.5.0/docs/api/java/util/Formatter.html">这里</a>。主要使用方法的代码示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">import java.io.BufferedReader;
+import java.io.FileReader;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+&#x2F;**
+ * 格式化测试使用的示例类.
+ *
+ * @author blinkfox on 2017-11-28.
+ *&#x2F;
+public class FormatTester &#123;
+
+    private static final Logger log &#x3D; LoggerFactory.getLogger(FormatTester.class);
+
+    &#x2F;**
+     * 格式化.
+     *&#x2F;
+    private static void formatter() &#123;
+        StringBuilder sb &#x3D; new StringBuilder();
+        Formatter formatter &#x3D; new Formatter(sb, Locale.US);
+
+        &#x2F;&#x2F; 可重新排序输出.
+        formatter.format(&quot;%n%4$2s %3$2s %2$2s %1$2s %n&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;); &#x2F;&#x2F; -&gt; &quot; d  c  b  a&quot;
+        formatter.format(Locale.FRANCE, &quot;e &#x3D; %+10.4f&quot;, Math.E); &#x2F;&#x2F; -&gt; &quot;e &#x3D;    +2,7183&quot;
+        formatter.format(&quot;%nAmount gained or lost since last statement: $ %(,.2f&quot;, 6217.58);
+        &#x2F;&#x2F; -&gt; &quot;Amount gained or lost since last statement: $ 6,217.58&quot;
+
+        log.info(&quot;打印出格式化后的字符串:&#123;&#125;&quot;, formatter);
+        formatter.close();
+    &#125;
+
+    &#x2F;**
+     * printf打印.
+     *&#x2F;
+    private static void printf() &#123;
+        String filename &#x3D; &quot;testfile&quot;;
+        try (FileReader fileReader &#x3D; new FileReader(filename)) &#123;
+            BufferedReader reader &#x3D; new BufferedReader(fileReader);
+            String line;
+            int i &#x3D; 1;
+            while ((line &#x3D; reader.readLine()) !&#x3D; null) &#123;
+                System.out.printf(&quot;Line %d: %s%n&quot;, i++, line);
+            &#125;
+        &#125; catch (Exception e) &#123;
+            System.err.printf(&quot;Unable to open file named &#39;%s&#39;: %s&quot;, filename, e.getMessage());
+        &#125;
+    &#125;
+
+    &#x2F;**
+     * stringFormat使用.
+     *&#x2F;
+    private static void stringFormat() &#123;
+        &#x2F;&#x2F; 格式化日期.
+        Calendar c &#x3D; new GregorianCalendar(1995, Calendar.MAY, 23);
+        String s &#x3D; String.format(&quot;Duke&#39;s Birthday: %1$tm %1$te,%1$tY&quot;, c);
+        &#x2F;&#x2F; -&gt; s &#x3D;&#x3D; &quot;Duke&#39;s Birthday: May 23, 1995&quot;
+        log.info(s);
+    &#125;
+
+    &#x2F;**
+     * 格式化消息.
+     *&#x2F;
+    private static void messageFormat() &#123;
+        String msg &#x3D; &quot;欢迎光临，当前（&#123;0&#125;）等待的业务受理的顾客有&#123;1&#125;位，请排号办理业务！&quot;;
+        MessageFormat mf &#x3D; new MessageFormat(msg);
+        String fmsg &#x3D; mf.format(new Object[]&#123;new Date(), 35&#125;);
+        log.info(fmsg);
+    &#125;
+
+    &#x2F;**
+     * 格式化日期.
+     *&#x2F;
+    private static void dateFormat() &#123;
+        String str &#x3D; &quot;2010-1-10 17:39:21&quot;;
+        SimpleDateFormat format &#x3D; new SimpleDateFormat(&quot;yyyyMMddHHmmss&quot;);
+        try &#123;
+            log.info(&quot;格式化后的日期:&#123;&#125;&quot;, format.format(format.parse(str)));
+        &#125; catch (Exception e) &#123;
+            log.error(&quot;日期格式化出错！&quot;, e);
+        &#125;
+    &#125;
+
+    public static void main(String[] args) &#123;
+        formatter();
+        stringFormat();
+        messageFormat();
+        dateFormat();
+        printf();
+    &#125;
+
+&#125;</code></pre><h3 id="3-新增Scanner类-Scanner"><a href="#3-新增Scanner类-Scanner" class="headerlink" title="3. 新增Scanner类(Scanner)"></a>3. 新增Scanner类(Scanner)</h3><p><code>java.util.Scanner</code>是Java5的新特征，主要功能是简化文本扫描，但这个类最实用的地方还是在获取控制台输入。</p><h4 id="1-Scanner概述"><a href="#1-Scanner概述" class="headerlink" title="(1). Scanner概述"></a>(1). Scanner概述</h4><p>可以从字符串(<code>Readable</code>)、输入流、文件、Channel等来直接构造Scanner对象，有了Scanner了，就可以逐段（根据正则分隔式）来扫描整个文本，并对扫描后的结果做想要的处理。</p><p><code>Scanner</code>默认使用<strong>空格</strong>作为分割符来分隔文本，但允许你使用<code>useDelimiter(Pattern pattern)</code>或<code>useDelimiter(String pattern)</code>方法来指定新的分隔符。</p><p>主要API如下：</p><ul><li><code>delimiter()</code>: 返回此<code>Scanner</code>当前正在用于匹配分隔符的<code>Pattern</code>。</li><li><code>hasNext()</code>: 判断扫描器中当前扫描位置后是否还存在下一段。</li><li><code>hasNextLine()</code>: 如果在此扫描器的输入中存在另一行，则返回true。</li><li><code>next()</code>: 查找并返回来自此扫描器的下一个完整标记。</li><li><code>nextLine()</code>: 此扫描器执行当前行，并返回跳过的输入信息。</li></ul><h4 id="2-扫描控制台输入"><a href="#2-扫描控制台输入" class="headerlink" title="(2). 扫描控制台输入"></a>(2). 扫描控制台输入</h4><p>当通过<code>new Scanner(System.in)</code>创建了一个<code>Scanner</code>实例时，控制台会一直等待输入，直到敲回车键结束，把所输入的内容传给<code>Scanner</code>，作为扫描对象。如果要获取输入的内容，则只需要调用<code>Scanner</code>的<code>nextLine()</code>方法即可。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+* 扫描控制台输入.
+*
+* @author blinkfox 2017-11-28
+*&#x2F;
+public class ScannerTest &#123;
+
+    public static void main(String[] args) &#123;
+        Scanner s &#x3D; new Scanner(System.in);
+        System.out.println(&quot;请输入字符串：&quot;);
+        while (true) &#123;
+            String line &#x3D; s.nextLine();
+            if (line.equals(&quot;exit&quot;)) break;
+            System.out.println(&quot;&gt;&gt;&gt;&quot; + line);
+        &#125;
+    &#125;
+
+&#125;</code></pre><h4 id="3-其它示例"><a href="#3-其它示例" class="headerlink" title="(3).其它示例"></a>(3).其它示例</h4><p>该示例中会从<code>myNumbers</code>文件中读取长整型<code>long</code>的数据。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Scanner sc &#x3D; new Scanner(new File(&quot;myNumbers&quot;));
+while (sc.hasNextLong()) &#123;
+    long aLong &#x3D; sc.nextLong();
+&#125;</code></pre><p>以下示例可以使用除空格之外的分隔符来从一个字符串中读取几个条目：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">String input &#x3D; &quot;1 fish 2 fish red fish blue fish&quot;;
+Scanner s &#x3D; new Scanner(input).useDelimiter(&quot;\\s*fish\\s*&quot;);
+System.out.println(s.nextInt());
+System.out.println(s.nextInt());
+System.out.println(s.next());
+System.out.println(s.next());
+s.close();</code></pre><p>将输出：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">1
+2
+red
+blue</code></pre><h3 id="4-增强反射功能-Reflection"><a href="#4-增强反射功能-Reflection" class="headerlink" title="4. 增强反射功能(Reflection)"></a>4. 增强反射功能(Reflection)</h3><p>Java5反射功能方面的增强主要在<code>java.lang.Class</code>和<code>java.lang.reflect</code>类中。</p><p>主要有以下内容增强：</p><ul><li><strong>支持泛型</strong>: 可以检查类型、方法、构造方法或字段的声明并获取泛型所对应的类型信息。</li><li><strong>支持注解</strong>: 通过使用<code>getAnnotation()</code>方法获取已经在运行时标记为可用的方法和构造方法的类型，方法，字段，构造方法和形式参数的注释。人们还可以确定一个接口是否是一个注解类型。</li><li><strong>支持枚举</strong>: 可以确定一个类是否是一个枚举，以及一个字段是否代表一个枚举常量。</li><li><strong>支持可变参数</strong>: 可以确定一个方法或构造方法是否是可变参数方法。</li><li><strong>便利的方法</strong>: 用于确定一个类是否是本地的、匿名的还是成员类，以及一个类型的简单名称是什么。</li><li><strong>java.lang.Class类型标记</strong>: 允许使用<code>java.lang.Class</code>的实例作为类型标记。</li></ul><h3 id="5-增强集合框架-Collections-Framework"><a href="#5-增强集合框架-Collections-Framework" class="headerlink" title="5. 增强集合框架(Collections Framework)"></a>5. 增强集合框架(Collections Framework)</h3><p>在Java5中<a target="_blank" rel="noopener external nofollow noreferrer" href="https://docs.oracle.com/javase/1.5.0/docs/guide/collections/changes5.html">集合框架的增强</a>主要在以下几个方面：</p><ul><li>三种新语言特性都有针对集合，包括<strong>泛型</strong>，<strong>增强for循环</strong>和<strong>自动装箱</strong>。</li><li>三个新的接口已被添加到集合框架中，分别是：<code>Queue</code>，<code>BlockingQueue</code>和<code>ConcurrentMap</code>（后两个位于<code>java.util.concurrent</code>包中）。</li><li>提供了两个新的具体队列实现(<code>PriorityQueue</code>、<code>ConcurrentLinkedQueue</code>)，一个现有的列表实现已经被改造来实现队列(<code>LinkedList</code>)，并且提供了一个抽象队列实现(<code>AbstractQueue</code>)。</li><li>已经添加了五个阻塞队列实现，以及一个ConcurrentMap实现，分别是：<code>ArrayBlockingQueue</code>, <code>LinkedBlockingQueue</code>, <code>PriorityBlockingQueue</code>, <code>DelayQueue</code>, <code>SynchronousQueue</code>、<code>ConcurrentHashMap</code>。</li><li>为类型安全的枚举提供了特殊用途的Map和Set实现。(<code>EnumMap</code>和<code>EnumSet</code>)</li><li>添加了特殊用途的<code>copy-on-write</code>List和Set实现，分别是：<code>CopyOnWriteArrayList</code>和<code>CopyOnWriteArraySet</code>。</li><li>提供了包装器的实现来对大多数<code>Collection</code>接口添加动态类型安全性的检查(<code>Collections.checkedInterface</code>)。检查要添加的元素的类型并返回结果。任何尝试添加非法类型的变量都会抛出一个<code>ClassCastException</code>异常。这个功能可以防止在运行的时候出错。</li><li>提供了几个新的算法来处理集合。<ul><li><code>frequency(Collection&lt;?&gt; c, Object o)</code> - 计算指定集合中指定元素出现的次数。</li><li><code>disjoint(Collection&lt;?&gt; c1, Collection&lt;?&gt; c2)</code> - 判断两个集合是否不相交，换句话说，是否它们不包含任何共同的元素。</li><li><code>addAll(Collection&lt;? super T&gt; c, T... a)</code> - 将指定数组中的所有元素添加到指定的集合中。</li><li><code>Comparator&lt;T&gt; reverseOrder(Comparator&lt;T&gt; cmp)</code> - 返回一个比较器，表示指定比较器的反向排序。</li></ul></li><li>提供了计算哈希代码和字符串表示的方法。<code>Arrays</code>工具类已经为所有类型的数组提供了基于内容的<code>hashCode</code>和<code>toString</code>方法。 这些方法补充了现有的<code>equals</code>方法。现在可以打印任何数组的内容。</li></ul><h3 id="6-并发工具类-Concurrency-Utilities"><a href="#6-并发工具类-Concurrency-Utilities" class="headerlink" title="6. 并发工具类(Concurrency Utilities)"></a>6. 并发工具类(Concurrency Utilities)</h3><p><code>java.util.concurrent</code>，<code>java.util.concurrent.atomic</code>和<code>java.util.concurrent.locks</code>包为开发并发类应用程序提供了一个强大的，可扩展的高性能，可伸缩，线程安全构建框架，包括 线程池，线程安全集合，信号量，任务调度框架，任务同步实用程序，原子变量和锁。将这些软件包添加到核心类库可以使程序员免去手工制作这些工具的需要，这与集合框架用于数据结构的方式大致相同。关于并发相关的的介绍会在以后更详细的来讲解。</p><h3 id="7-StringBuilder"><a href="#7-StringBuilder" class="headerlink" title="7. StringBuilder"></a>7. StringBuilder</h3><p><code>StringBuilder</code>也是Java5中新增的类，主要用来代替<code>+</code>号和<code>StringBuffer</code>来更加高效的拼接字符串。<code>StringBuffer</code>与<code>StringBuilder</code>都是继承于<code>AbstractStringBuilder</code>，主要的区别就是<code>StringBuffer</code>的函数上都有<code>synchronized</code>关键字，保证线程安全。</p><p>关于<code>StringBuilder</code>的使用这里就不再详细介绍了，网上文章也有很多。总之，对于<strong>动态字符串</strong>的拼接推荐使用<code>StringBuilder</code>。<strong>静态字符串</strong>的拼接直接使用<code>+</code>号或者字符串的<code>concat(String str)</code>方法，甚至也使用<code>StringBuilder</code>亦可。</p><h2 id="九、其它-others"><a href="#九、其它-others" class="headerlink" title="九、其它(others)"></a>九、其它(others)</h2><ul><li><strong>Instrumentation</strong>: 使用<code>java.lang.instrument</code>，开发者可以构建一个代理，用来监测运行在JVM上的程序。它类似一种更低级，更松耦合的AOP，可以从底层来改变一个类的行为。</li><li><strong>Networking</strong>: 网络编程功能增强。</li><li><strong>Internationalization</strong>: 国际化是设计一个应用程序的过程，以便它可以适应各种语言和地区而无需改变工程。国际化这个术语缩写为<code>i18n</code>，因为在第一个<code>i</code>和最后一个<code>n</code>之间有<code>18</code>个字母。</li><li><strong>改善了环境变量的支持</strong>: <code>System.getenv(String)</code>方法不再被弃用。新的<code>System.getenv()</code>方法允许作为<code>Map &lt;String，String&gt;</code>访问进程环境。</li><li><strong>JAXP</strong>: 用于XML处理的<code>Java API(JAXP)</code>包括通过标准化的Java平台API来处理XML文档的基本设施。</li><li><strong>Serialization</strong>: 已经添加了支持来处理5.0版本中新增的枚举类型。序列化枚举实例的规则与序列化<strong>普通</strong>可序列化对象的规则不同：枚举实例的序列化形式仅由其枚举常量名以及标识其基本枚举类型的信息组成。 反序列化行为也不相同 - 类信息用于查找适当的枚举类，并且<code>Enum.valueOf</code>方法与该类和所接收的常量名称一起被调用，以便获取返回的枚举常量。</li><li><strong>监控和管理</strong>: Java5为Java平台的监视和管理提供了显着的增强。</li><li>…</li></ul><hr><p>参考文档:</p><ul><li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://segmentfault.com/a/1190000004417288">Java5的新特性</a></li><li><a target="_blank" rel="noopener external nofollow noreferrer" href="https://docs.oracle.com/javase/1.5.0/docs/relnotes/features.html">Oracle Java文档</a></li></ul></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/11/25651.html" class="pre-post btn btn-default" title="Java6新特性及使用"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">Java6新特性及使用</span> </a><a href="/blog/2018/11/22033.html" class="next-post btn btn-default" title="Java注解的理解和应用"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">Java注解的理解和应用</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

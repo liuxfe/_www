@@ -1,0 +1,178 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="Linux"><meta name="description" content="1. ls - 列出文件名和目录ls命令是Linux中最常用的命令之一，其作用就是列出文件名和目录。在命令行提示符下，直接输入ls命令，不带任何选项，将列出当前目录下所有文件和目录，但不会显示详..."><title>常用Bash命令整理之查看文件和目录 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="常用Bash命令整理之查看文件和目录">常用Bash命令整理之查看文件和目录</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/">软件工具</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/Linux/" rel="tag">Linux</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/10/09</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 969</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="1-ls-列出文件名和目录"><a href="#1-ls-列出文件名和目录" class="headerlink" title="1. ls - 列出文件名和目录"></a>1. ls - 列出文件名和目录</h2><p><code>ls</code>命令是<code>Linux</code>中最常用的命令之一，其作用就是列出文件名和目录。在命令行提示符下，直接输入<code>ls</code>命令，不带任何选项，将列出当前目录下所有文件和目录，但不会显示详细的信息，比如，文件类型、大小、修改日期和时间、权限等。</p><p>以下便是<code>ls</code>命令及其选项的作用说明：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 仅列出当前目录下所有文件和目录
+ls
+
+# 每行显示一条记录，每条记录包括文件类型、大小、修改日期和时间、权限等
+ls -l
+
+# 将文件大小显示符合人类阅读习惯的格式
+ls -lh
+
+# 将使用不同的特殊字符归类不同的文件类型
+ls -F
+
+# 以长列表格式列出某个目录的信息
+ls -ld &#x2F;var&#x2F;log
+
+# 将递归地列出子目录的内容
+ls -R &#x2F;etc&#x2F;sysconfig&#x2F;
+
+# 以长列表格式按文件或目录的修改时间倒序地列出文件和目录
+ls -ltr
+
+# 以长列表格式按文件大小顺序列出文件和目录
+ls -ls
+
+# 列出包括隐藏文件或目录在内的所有文件和目录，包括“.”（当前目录）和“..”（父目录）
+ls -a
+
+# 列出包括隐藏文件或目录在内的所有文件和目录，不包括“.”（当前目录）和“..”（父目录）
+ls -A
+
+输出的内容类似于-l选项，指示显示uid和gid，替代显示所有者和用户组
+ls -n</code></pre><h2 id="2-cat-连接显示文件内容"><a href="#2-cat-连接显示文件内容" class="headerlink" title="2. cat - 连接显示文件内容"></a>2. cat - 连接显示文件内容</h2><p><code>cat</code> 命令也是Linux系统中最常用的命令之一。<code>cat</code>命令让我们可以看看文件的内容、连接文件、创建一个或多个文件和重定向输出到终端或文件。</p><p><code>cat</code>命令的语法如下所示：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">cat [OPTION] [FILE]...</code></pre><p><code>cat</code>常用命令如下：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 使用 cat 命令查看文件 &#x2F;etc&#x2F;group 的内容
+cat &#x2F;etc&#x2F;group
+
+# 显示多个文件的内容
+cat &#x2F;etc&#x2F;redhat-release &#x2F;etc&#x2F;issue
+
+# -n 选项，可以显示文件内容的行号
+cat -n &#x2F;etc&#x2F;fstab
+
+# -b 选项和 -n 选项类似，但只标识非空白行的行号
+cat -b &#x2F;etc&#x2F;fstab
+
+# -e 选项，将在每一行的结尾显示“$”字符
+cat -e &#x2F;etc&#x2F;fstab</code></pre><blockquote><p>当你只输入 cat 命令，而没有任何参数时，它只是接收标准输入的内容并在标准输出中显示。所以你在输入一行内容并回车后，会在接下来的一行显示相同的内容。你也可以重定向标准输出到一个新文件。</p></blockquote><h2 id="3-less、more-分屏显示文件"><a href="#3-less、more-分屏显示文件" class="headerlink" title="3.less、more - 分屏显示文件"></a>3.less、more - 分屏显示文件</h2><p><code>more</code>命令在你使用小的xterm窗口时，或是想不使用文本编辑器而只是简单地阅读一个文件时是很有用的。more命令是一个用于一次翻阅一整屏文件的过滤器。</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 查看一个文件，自动清空屏幕并显示文件开头部分
+more &#x2F;etc&#x2F;inittab
+
+# 指定一次显示num行
+more -num &#x2F;etc&#x2F;inittab</code></pre><p>与<code>more</code>命令相比，我个人更喜欢<code>less</code>命令来查看文件。<code>less</code>命令与<code>more</code>命令类似，但<code>less</code>命令向前和向后翻页都支持，而且<code>less</code>命令不需要在查看前加载整个文件，即<code>less</code>命令查看文件更快速。</p><p><code>less</code>常用命令参数如下：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">-b  &lt;缓冲区大小&gt; 设置缓冲区的大小
+-e  当文件显示结束后，自动离开
+-f  强迫打开特殊文件，例如外围设备代号、目录和二进制文件
+-g  只标志最后搜索的关键词
+-i  忽略搜索时的大小写
+-m  显示类似more命令的百分比
+-N  显示每行的行号
+-o  &lt;文件名&gt; 将less 输出的内容在指定文件中保存起来
+-Q  不使用警告音
+-s  显示连续空行为一行
+-S  行过长时间将超出部分舍弃
+-x  &lt;数字&gt; 将“tab”键显示为规定的数字空格
+&#x2F;字符串：向下搜索“字符串”的功能
+?字符串：向上搜索“字符串”的功能
+n： 重复前一个搜索（与 &#x2F; 或 ? 有关）
+N： 反向重复前一个搜索（与 &#x2F; 或 ? 有关）
+b  向后翻一页
+d  向后翻半页
+h  显示帮助界面
+Q  退出less 命令
+u  向前滚动半页
+y  向前滚动一行
+空格键 滚动一行
+回车键 滚动一页
+[pagedown]： 向下翻动一页
+[pageup]：   向上翻动一页</code></pre><h2 id="4-head-显示文件头部"><a href="#4-head-显示文件头部" class="headerlink" title="4.head - 显示文件头部"></a>4.head - 显示文件头部</h2><p><code>head</code>命令用于打印指定输入的开头部分内容。默认情况下，打印每个指定输入的前10行内容。</p><p>使用<code>-n</code>选项可以指定打印文件的前N行：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 指定打印文件的前5行
+head -n 5 &#x2F;etc&#x2F;inittab
+（或）head -5 &#x2F;etc&#x2F;inittab
+
+# 打印文件的前N个字节的数据
+head -c 10 &#x2F;etc&#x2F;inittab</code></pre><h2 id="5-tail-显示文件尾部"><a href="#5-tail-显示文件尾部" class="headerlink" title="5.tail - 显示文件尾部"></a>5.tail - 显示文件尾部</h2><p><code>tail</code>命令和<code>head</code>命令相反，它打印指定输入的结尾部分的内容。默认情况下，它打印指定输入的最后10行内容。</p><p>使用<code>-n</code>选项可以指定打印文件的最后N行：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 指定打印文件的后10行
+tail -n 10 &#x2F;etc&#x2F;inittab
+tail -10 &#x2F;etc&#x2F;inittab
+
+# 即时打印文件中新写入的行
+tail -f &#x2F;var&#x2F;log&#x2F;messages
+
+# --retry选项表示持续尝试打开某个文件，当你想打开一个稍后才会创建或即使不可用的文件
+tail -f &#x2F;tmp&#x2F;debug.log --retry</code></pre><h2 id="6-file-查看文件类型"><a href="#6-file-查看文件类型" class="headerlink" title="6.file - 查看文件类型"></a>6.file - 查看文件类型</h2><p><code>file</code>命令用于接收一个文件作为参数并执行某些测试，已确定正确的文件类型。</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 查看文件类型
+file &#x2F;etc&#x2F;inittab
+
+# 可以MIME类型的格式显示文件类型的信息
+file -i  &#x2F;etc&#x2F;inittab
+
+# 使用-N 选项，输出的队列可以以在文件名之后无空白填充的形式显示
+file -N *</code></pre><h2 id="7-wc-查看文件统计信息"><a href="#7-wc-查看文件统计信息" class="headerlink" title="7.wc - 查看文件统计信息"></a>7.wc - 查看文件统计信息</h2><p><code>wc</code>命令用于查看文件的行数、单词数和字符数等信息。语法类似如下所示：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">wc filename
+X Y Z &#x2F;etc&#x2F;inittab</code></pre><p>其中X表示行数，Y表示单词数，Z表示字节数，filename表示文件名。</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># -l选项，可以只统计文件的行数信息
+wc -l &#x2F;etc&#x2F;inittab
+
+# -w选项，可以只统计文件的单词数信息
+wc -w &#x2F;etc&#x2F;inittab
+
+# -c选项，可以只统计文件的字节数信息
+wc -c &#x2F;etc&#x2F;inittab
+
+# -L选项，可以只统计文件中最长的行的长度
+wc -L &#x2F;etc&#x2F;inittab</code></pre><h2 id="8-find-查找文件或目录"><a href="#8-find-查找文件或目录" class="headerlink" title="8.find - 查找文件或目录"></a>8.find - 查找文件或目录</h2><p><code>find</code>命令用于根据你指定的参数搜索和定位文件和目录的列表。<code>find</code>命令可以在多种情况下使用，比如你可以通过权限、用户、用户组、文件类型、日期、大小和其他可能的条件来查找文件。</p><p><code>find</code>命令常用使用和说明如下：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 查找指定目录下的某个文件
+find &#x2F;etc&#x2F; -name inittab
+
+# 在当前目录下查找名称为 inittab 的文件
+find . -name inittab
+
+# 在当前目录下，文件不区分大小写是example的所有文件
+find . -iname example
+
+# 找出当前目录下所有以 sh 结尾的文件
+find . -type f -name &quot;*.sh&quot;
+
+# 找出当前目录下，文件权限是 777 的所有文件
+find . -type f -perm 777
+
+# 找出当前目录下，文件权限不是 777 的所有文件
+find . -type f ! -perm 777
+
+# 找出当前目录下所有只读文件
+find . -type f ! -perm &#x2F;a+w
+
+# 找出你帐号主目录下的所有可执行文件
+find ~ -type f -perm &#x2F;a+w
+
+# 找出 &#x2F;tmp 目录下的.log文件并将其删除：
+find &#x2F;tmp&#x2F; -type f -name &quot;*.log&quot; -exec rm -f &#123;&#125; \;
+
+# 找出当前目录下的所有空文件
+find . -type f -empty
+
+# 找出当前目录下的所有空目录
+find . -type d -empty
+
+# 找出 &#x2F;tmp 目录下的所有隐藏文件
+find &#x2F;tmp&#x2F; -type f -name &quot;.*&quot;
+
+# 找出 &#x2F;tmp 目录下，所有者是 root 的文件和目录
+find &#x2F;tmp&#x2F; -user root
+
+# 找出 &#x2F;tmp 目录下，用户组是 developer 的文件和目录
+find &#x2F;tmp&#x2F; -group root
+
+# 找出你账号的主目录下，3 天前修改的文件
+find ~ -type f -mtime 3
+
+# 找出你账号的主目录下，30 天以前修改的所有文件
+find ~ -type f -mtime +30
+
+# 找出你账号的主目录下，3 天以内修改的所有文件
+find ~ -type f -mtime -3
+
+# 找出你账号的主目录下，30 天以前，60 天以内修改的所有文件
+find ~ -type f -mtime +30 -mtime -60
+
+# 找出 &#x2F;etc 目录下，一小时以内变更过的文件
+find &#x2F;etc -type f -cmin -60
+
+# 找出 &#x2F;etc 目录下，一小时以内访问过的文件
+find &#x2F;etc -type f -amin -60
+
+# 找出你账号主目录下，大小是50MB的所有文件
+find ~ -type f -size 50MB
+
+# 找出你账号主目录下，大于50MB小于100MB的所有文件
+find ~ -type f -size +50MB -size -100MB
+
+# 找出你账号主目录下，大于100MB的文件并将其删除
+find ~ -type f -size +100MB -exec rm -rf &#123;&#125; \;</code></pre></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/10/39242.html" class="pre-post btn btn-default" title="常用Bash命令整理之操作文件和目录"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">常用Bash命令整理之操作文件和目录</span> </a><a href="/blog/2018/10/42423.html" class="next-post btn btn-default" title="巧用 JS 位运算"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">巧用 JS 位运算</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

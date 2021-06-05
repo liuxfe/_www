@@ -1,0 +1,347 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="note"><meta name="description" content="设计模式（Design Pattern）是一套被反复使用、多数人知晓的、经过分类编目的、代码设计经验的总结。设计模式是一种思想，常见的生活例子如：盖房子的设计图纸，古代战争的孙子兵法。设计模式（..."><title>设计模式 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="设计模式">设计模式</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/design/">design</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/note/" rel="tag">note</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/04/19</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 1142</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><p>设计模式（Design Pattern）是一套被反复使用、多数人知晓的、经过分类编目的、代码设计经验的总结。设计模式是一种思想，常见的生活例子如：盖房子的设计图纸，古代战争的孙子兵法。设计模式（Design pattern）代表了最佳的实践，通常被有经验的面向对象的软件开发人员所采用。设计模式是软件开发人员在软件开发过程中面临的一般问题的解决方案。这些解决方案是众多软件开发人员经过相当长的一段时间的试验和错误总结出来的。</p><p><strong>设计模式的目的：</strong></p><blockquote><p>设计模式是优秀的使用案例，使用设计模式可提高代码的重用性、让代码更容易被他人理解、保证代码可靠性。</p></blockquote><p>java基本模式有23种：单例模式、抽象工厂模式、建造者模式、工厂模式、原型模式….，下面分别介绍一下设计模式：</p><h2 id="单例模式Singleton"><a href="#单例模式Singleton" class="headerlink" title="单例模式Singleton"></a>单例模式Singleton</h2><p>保证整个应用中某个实例有且只有一个。常见的生活例子有：古代皇帝有且只有一个、中国的一妻一夫制… 开发中，有些对象我们只需要一个，比如：配置文件、工具类、线程池、缓存、日志对象等，如果创造出多个实例，就会导致许多问题，比如占用过多资源，不一致的结果等。</p><p><strong>应用场合：</strong>有些对象只需要一个就足够了，如古代皇帝、老婆<br><strong>作用：</strong>保证整个应用程序中某个实例有且只有一个<br><strong>类型：</strong>饿汉模式、懒汉模式</p><h3 id="单例模式的饿汉式实现"><a href="#单例模式的饿汉式实现" class="headerlink" title="单例模式的饿汉式实现"></a>单例模式的饿汉式实现</h3><p>单例类：</p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">package com.sosout;
+&#x2F;**
+* 饿汉模式
+*&#x2F;
+public class Singleton &#123;
+  &#x2F;&#x2F; 1、将构造方法私有化，不允许外部直接创建对象
+  private Singleton() &#123;
+  &#125;
+
+  &#x2F;&#x2F; 2、创建类的唯一实例，使用private static修饰
+  private static Singleton instance &#x3D; new Singleton();
+
+  &#x2F;&#x2F; 3、提供一个用于获取实例的方法，使用public static 修饰
+  public static Singleton getInstance() &#123;
+    return instance;
+  &#125;
+&#125;</code></pre><p>测试类：</p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">package com.sosout;
+public class Test &#123;
+  public static void main(String[] args) &#123;
+    Singleton s1 &#x3D; Singleton.getInstance();
+    Singleton s2 &#x3D; Singleton.getInstance();
+    if (s1 &#x3D;&#x3D; s2) &#123;
+      System.out.println(&quot;s1和s2是同一个实例&quot;);
+    &#125; else &#123;
+      System.out.println(&quot;s1和s2不是同一个实例&quot;);
+    &#125;
+  &#125;
+&#125;</code></pre><h3 id="单例模式的懒汉式实现"><a href="#单例模式的懒汉式实现" class="headerlink" title="单例模式的懒汉式实现"></a>单例模式的懒汉式实现</h3><p>单例类：</p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">package com.sosout;
+&#x2F;**
+* 懒汉模式
+*&#x2F;
+public class Singleton2 &#123;
+  &#x2F;&#x2F; 1、将构造方法私有化，不允许外部直接创建对象
+  private Singleton2() &#123;
+  &#125;
+
+  &#x2F;&#x2F; 2、创建类的唯一实例，使用private static修饰
+  private static Singleton2 instance;
+
+  &#x2F;&#x2F; 3、提供一个用于获取实例的方法，使用public static 修饰
+  public static Singleton2 getInstance() &#123;
+    if (instance &#x3D;&#x3D; null) &#123;
+      instance &#x3D; new Singleton2();
+    &#125;
+    return instance;
+  &#125;
+&#125;</code></pre><p>测试类：</p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">package com.sosout;
+public class Test &#123;
+  public static void main(String[] args) &#123;
+    &#x2F;&#x2F; 饿汉模式
+    Singleton s1 &#x3D; Singleton.getInstance();
+    Singleton s2 &#x3D; Singleton.getInstance();
+    if (s1 &#x3D;&#x3D; s2) &#123;
+      System.out.println(&quot;s1和s2是同一个实例&quot;);
+    &#125; else &#123;
+      System.out.println(&quot;s1和s2不是同一个实例&quot;);
+    &#125;
+
+    &#x2F;&#x2F; 懒汉模式
+    Singleton2 s3 &#x3D; Singleton2.getInstance();
+    Singleton2 s4 &#x3D; Singleton2.getInstance();
+    if (s3 &#x3D;&#x3D; s4) &#123;
+      System.out.println(&quot;s3和s4是同一个实例&quot;);
+    &#125; else &#123;
+      System.out.println(&quot;s3和s4不是同一个实例&quot;);
+    &#125;
+  &#125;
+&#125;</code></pre><h3 id="饿汉模式和懒汉模式区别"><a href="#饿汉模式和懒汉模式区别" class="headerlink" title="饿汉模式和懒汉模式区别"></a>饿汉模式和懒汉模式区别</h3><p>饿汉模式的特点是加载类时比较慢，但运行时获取对象的速度比较快，线程安全的，懒汉模式的特点是加载类时比较快，但运行时获取对象的速度比较慢，线程不安全的。</p><p><strong>在JavaScript里，单例作为一个命名空间提供者，从全局命名空间里提供一个唯一的访问点来访问该对象。</strong></p><p><strong>在JavaScript里，实现单例的方式有很多种，其中最简单的一个方式是使用对象字面量的方法，其字面量里可以包含大量的属性和方法：</strong></p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">var mySingleton &#x3D; &#123;
+  property1: &quot;something&quot;,
+  property2: &quot;something else&quot;,
+  method1: function () &#123;
+    console.log(&#39;hello world&#39;);
+  &#125;
+&#125;;</code></pre><p><strong>如果以后要扩展该对象，你可以添加自己的私有成员和方法，然后使用闭包在其内部封装这些变量和函数声明。只暴露你想暴露的public成员和方法，样例代码如下：</strong></p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">var mySingleton &#x3D; function () &#123;
+
+  &#x2F;* 这里声明私有变量和方法 *&#x2F;
+  var privateVariable &#x3D; &#39;something private&#39;;
+  function showPrivate() &#123;
+    console.log(privateVariable);
+  &#125;
+
+  &#x2F;* 公有变量和方法（可以访问私有变量和方法） *&#x2F;
+  return &#123;
+    publicMethod: function () &#123;
+      showPrivate();
+    &#125;,
+    publicVar: &#39;the public can see this!&#39;
+  &#125;;
+&#125;;
+
+var single &#x3D; mySingleton();
+single.publicMethod();  &#x2F;&#x2F; 输出 &#39;something private&#39;
+console.log(single.publicVar); &#x2F;&#x2F; 输出 &#39;the public can see this!&#39;</code></pre><p><strong>上面的代码很不错了，但如果我们想做到只有在使用的时候才初始化，那该如何做呢？为了节约资源的目的，我们可以另外一个构造函数里来初始化这些代码，如下：</strong></p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">var Singleton &#x3D; (function () &#123;
+    var instantiated;
+    function init() &#123;
+        &#x2F;*这里定义单例代码*&#x2F;
+        return &#123;
+            publicMethod: function () &#123;
+                console.log(&#39;hello world&#39;);
+            &#125;,
+            publicProperty: &#39;test&#39;
+        &#125;;
+    &#125;
+
+    return &#123;
+        getInstance: function () &#123;
+            if (!instantiated) &#123;
+                instantiated &#x3D; init();
+            &#125;
+            return instantiated;
+        &#125;
+    &#125;;
+&#125;)();
+
+&#x2F;*调用公有的方法来获取实例:*&#x2F;
+Singleton.getInstance().publicMethod();</code></pre><h2 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h2><h3 id="什么是工厂模式？"><a href="#什么是工厂模式？" class="headerlink" title="什么是工厂模式？"></a>什么是工厂模式？</h3><p>实例化对象，用工厂方法代替new操作。<br>工厂模式包括工厂方法模式和抽象工厂模式。<br>抽象工厂模式是工厂方法模式的扩展。</p><h2 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>定义一系列的算法，把它们一个个封装起来，并且使它们可以相互替换。</p><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><p><strong>1、</strong>策略模式利用组合，委托等技术和思想，有效的避免很多if条件语句。<br><strong>2、</strong>策略模式提供了开放-封闭原则，使代码更容易理解和扩展。<br><strong>3、</strong>策略模式中的代码可以复用。</p><h3 id="示例：使用策略模式计算奖金"><a href="#示例：使用策略模式计算奖金" class="headerlink" title="示例：使用策略模式计算奖金"></a>示例：使用策略模式计算奖金</h3><p>比如公司的年终奖是根据员工的工资和绩效来考核的，绩效为A的人，年终奖为工资的4倍，绩效为B的人，年终奖为工资的3倍，绩效为C的人，年终奖为工资的2倍；现在我们使用一般的编码方式会如下这样编写代码：</p><h4 id="一般方式"><a href="#一般方式" class="headerlink" title="一般方式"></a>一般方式</h4><pre class="line-numbers language-js" data-language="js"><code class="language-js">var calculateBouns &#x3D; function(salary,level) &#123;
+  if(level &#x3D;&#x3D;&#x3D; &#39;A&#39;) &#123;
+    return salary * 4;
+  &#125;
+  if(level &#x3D;&#x3D;&#x3D; &#39;B&#39;) &#123;
+    return salary * 3;
+  &#125;
+  if(level &#x3D;&#x3D;&#x3D; &#39;C&#39;) &#123;
+    return salary * 2;
+  &#125;
+&#125;;
+&#x2F;&#x2F; 调用如下：
+console.log(calculateBouns(4000,&#39;A&#39;)); &#x2F;&#x2F; 16000
+console.log(calculateBouns(2500,&#39;B&#39;)); &#x2F;&#x2F; 7500</code></pre><p>第一个参数为薪资，第二个参数为等级；代码缺点如下：<br><strong>1、</strong>calculateBouns 函数包含了很多if-else语句。<br><strong>2、</strong>calculateBouns 函数缺乏弹性，假如还有D等级的话，那么我们需要在calculateBouns 函数内添加判断等级D的if语句；<br><strong>3、</strong>算法复用性差，如果在其他的地方也有类似这样的算法的话，但是规则不一样，我们这些代码不能通用。</p><h4 id="组合函数"><a href="#组合函数" class="headerlink" title="组合函数"></a>组合函数</h4><p>组合函数是把各种算法封装到一个个的小函数里面，比如等级A的话，封装一个小函数，等级为B的话，也封装一个小函数，以此类推；如下代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var performanceA &#x3D; function(salary) &#123;
+  return salary * 4;
+&#125;;
+var performanceB &#x3D; function(salary) &#123;
+  return salary * 3;
+&#125;;
+        
+var performanceC &#x3D; function(salary) &#123;
+  return salary * 2;
+&#125;;
+var calculateBouns &#x3D; function(level,salary) &#123;
+  if(level &#x3D;&#x3D;&#x3D; &#39;A&#39;) &#123;
+    return performanceA(salary);
+  &#125;
+  if(level &#x3D;&#x3D;&#x3D; &#39;B&#39;) &#123;
+    return performanceB(salary);
+  &#125;
+  if(level &#x3D;&#x3D;&#x3D; &#39;C&#39;) &#123;
+    return performanceC(salary);
+  &#125;
+&#125;;
+&#x2F;&#x2F; 调用如下
+console.log(calculateBouns(&#39;A&#39;,4500)); &#x2F;&#x2F; 18000</code></pre><p>代码看起来有点改善，但是还是有如下缺点：<br>calculateBouns 函数有可能会越来越大，比如增加D等级的时候，而且缺乏弹性。</p><h4 id="策略模式-1"><a href="#策略模式-1" class="headerlink" title="策略模式"></a>策略模式</h4><h5 id="传统面向对象"><a href="#传统面向对象" class="headerlink" title="传统面向对象"></a>传统面向对象</h5><p>策略模式指的是 定义一系列的算法，把它们一个个封装起来，将不变的部分和变化的部分隔开，实际就是将算法的使用和实现分离出来；算法的使用方式是不变的，都是根据某个算法取得计算后的奖金数，而算法的实现是根据绩效对应不同的绩效规则；<br>一个基于策略模式的程序至少由2部分组成，第一个部分是一组策略类，策略类封装了具体的算法，并负责具体的计算过程。第二个部分是环境类Context，该Context接收客户端的请求，随后把请求委托给某一个策略类。我们先使用传统面向对象来实现；<br>如下代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var performanceA &#x3D; function()&#123;&#125;;
+performanceA.prototype.calculate &#x3D; function(salary) &#123;
+    return salary * 4;
+&#125;;
+        
+var performanceB &#x3D; function()&#123;&#125;;
+performanceB.prototype.calculate &#x3D; function(salary) &#123;
+    return salary * 3;
+&#125;;
+
+var performanceC &#x3D; function()&#123;&#125;;
+performanceC.prototype.calculate &#x3D; function(salary) &#123;
+    return salary * 2;
+&#125;;
+&#x2F;&#x2F; 奖金类
+var Bouns &#x3D; function()&#123;
+    this.salary &#x3D; null;    &#x2F;&#x2F; 原始工资
+    this.levelObj &#x3D; null;  &#x2F;&#x2F; 绩效等级对应的策略对象
+&#125;;
+Bouns.prototype.setSalary &#x3D; function(salary) &#123;
+    this.salary &#x3D; salary;  &#x2F;&#x2F; 保存员工的原始工资
+&#125;;
+Bouns.prototype.setlevelObj &#x3D; function(levelObj)&#123;
+    this.levelObj &#x3D; levelObj;  &#x2F;&#x2F; 设置员工绩效等级对应的策略对象
+&#125;;
+&#x2F;&#x2F; 取得奖金数
+Bouns.prototype.getBouns &#x3D; function()&#123;
+    &#x2F;&#x2F; 把计算奖金的操作委托给对应的策略对象
+    return this.levelObj.calculate(this.salary);
+&#125;;
+var bouns &#x3D; new Bouns();
+bouns.setSalary(10000);
+bouns.setlevelObj(new performanceA()); &#x2F;&#x2F; 设置策略对象
+console.log(bouns.getBouns());  &#x2F;&#x2F; 40000
+        
+bouns.setlevelObj(new performanceB()); &#x2F;&#x2F; 设置策略对象
+console.log(bouns.getBouns());  &#x2F;&#x2F; 30000</code></pre><p>如上代码使用策略模式重构代码，可以看到代码职责更新分明，代码变得更加清晰。</p><h5 id="Javascript"><a href="#Javascript" class="headerlink" title="Javascript"></a>Javascript</h5><p>代码如下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var obj &#x3D; &#123;
+  &quot;A&quot;: function(salary) &#123;
+    return salary * 4;
+  &#125;,
+  &quot;B&quot;: function(salary) &#123;
+    return salary * 3;
+  &#125;,
+  &quot;C&quot;: function(salary) &#123;
+    return salary * 2;
+  &#125; 
+&#125;;
+var calculateBouns &#x3D;function(level,salary) &#123;
+    return obj[level](salary);
+&#125;;
+console.log(calculateBouns(&#39;A&#39;,10000)); &#x2F;&#x2F; 40000</code></pre><p>可以看到代码更加简单明了；<br>策略模式指的是定义一系列的算法，并且把它们封装起来，但是策略模式不仅仅只封装算法，我们还可以对用来封装一系列的业务规则，只要这些业务规则目标一致，我们就可以使用策略模式来封装它们；</p><h3 id="示例：使用策略模式进行表单校验"><a href="#示例：使用策略模式进行表单校验" class="headerlink" title="示例：使用策略模式进行表单校验"></a>示例：使用策略模式进行表单校验</h3><p>我们经常来进行表单验证，比如注册登录对话框，我们登录之前要进行验证操作：<br><strong>1、</strong>用户名不能为空。<br><strong>2、</strong>密码长度不能小于6位。<br><strong>3、</strong>手机号码必须符合格式。<br>。。。</p><p>比如HTML代码如下：</p><pre class="line-numbers language-html" data-language="html"><code class="language-html">&lt;form action &#x3D; &quot;http:&#x2F;&#x2F;www.baidu.com&quot; id&#x3D;&quot;registerForm&quot; method &#x3D; &quot;post&quot;&gt;
+  &lt;p&gt;
+      &lt;label&gt;请输入用户名：&lt;&#x2F;label&gt;
+      &lt;input type&#x3D;&quot;text&quot; name&#x3D;&quot;userName&quot;&#x2F;&gt;
+  &lt;&#x2F;p&gt;
+  &lt;p&gt;
+      &lt;label&gt;请输入密码：&lt;&#x2F;label&gt;
+      &lt;input type&#x3D;&quot;text&quot; name&#x3D;&quot;password&quot;&#x2F;&gt;
+  &lt;&#x2F;p&gt;
+  &lt;p&gt;
+      &lt;label&gt;请输入手机号码：&lt;&#x2F;label&gt;
+      &lt;input type&#x3D;&quot;text&quot; name&#x3D;&quot;phoneNumber&quot;&#x2F;&gt;
+  &lt;&#x2F;p&gt;
+&lt;&#x2F;form&gt;</code></pre><h4 id="一般方式-1"><a href="#一般方式-1" class="headerlink" title="一般方式"></a>一般方式</h4><p>我们正常的编写表单验证代码如下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var registerForm &#x3D; document.getElementById(&quot;registerForm&quot;);
+registerForm.onsubmit &#x3D; function()&#123;
+    if(registerForm.userName.value &#x3D;&#x3D;&#x3D; &#39;&#39;) &#123;
+        alert(&#39;用户名不能为空&#39;);
+        return;
+    &#125;
+    if(registerForm.password.value.length &lt; 6) &#123;
+        alert(&quot;密码的长度不能小于6位&quot;);
+        return;
+    &#125;
+    if(!&#x2F;(^1[3|5|8][0-9]&#123;9&#125;$)&#x2F;.test(registerForm.phoneNumber.value)) &#123;
+        alert(&quot;手机号码格式不正确&quot;);
+        return;
+    &#125;
+&#125;</code></pre><p>但是这样编写代码有如下缺点：<br><strong>1、</strong>registerForm.onsubmit 函数比较大，代码中包含了很多if语句；<br><strong>2、</strong>registerForm.onsubmit 函数缺乏弹性，如果增加了一种新的效验规则，或者想把密码的长度效验从6改成8，我们必须改registerForm.onsubmit 函数内部的代码。违反了开放-封闭原则。<br><strong>3、</strong>算法的复用性差，如果在程序中增加了另外一个表单，这个表单也需要进行一些类似的效验，那么我们可能又需要复制代码了；</p><h4 id="策略模式-2"><a href="#策略模式-2" class="headerlink" title="策略模式"></a>策略模式</h4><p>第一步我们先来封装策略对象，如下代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var strategy &#x3D; &#123;
+    isNotEmpty: function(value,errorMsg) &#123;
+        if(value &#x3D;&#x3D;&#x3D; &#39;&#39;) &#123;
+            return errorMsg;
+        &#125;
+    &#125;,
+    &#x2F;&#x2F; 限制最小长度
+    minLength: function(value,length,errorMsg) &#123;
+        if(value.length &lt; length) &#123;
+            return errorMsg;
+        &#125;
+    &#125;,
+    &#x2F;&#x2F; 手机号码格式
+    mobileFormat: function(value,errorMsg) &#123;
+        if(!&#x2F;(^1[3|5|8][0-9]&#123;9&#125;$)&#x2F;.test(value)) &#123;
+            return errorMsg;
+        &#125;
+    &#125; 
+&#125;;</code></pre><p>接下来我们准备实现Validator类，Validator类在这里作为Context，负责接收用户的请求并委托给strategy 对象，如下代码：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var Validator &#x3D; function()&#123;
+        this.cache &#x3D; [];  &#x2F;&#x2F; 保存效验规则
+&#125;;
+Validator.prototype.add &#x3D; function(dom,rule,errorMsg) &#123;
+    var str &#x3D; rule.split(&quot;:&quot;);
+    this.cache.push(function()&#123;
+        &#x2F;&#x2F; str 返回的是 minLength:6 
+        var strategy &#x3D; str.shift();
+        str.unshift(dom.value); &#x2F;&#x2F; 把input的value添加进参数列表
+        str.push(errorMsg);  &#x2F;&#x2F; 把errorMsg添加进参数列表
+        return strategys[strategy].apply(dom,str);
+    &#125;);
+&#125;;
+Validator.prototype.start &#x3D; function()&#123;
+    for(var i &#x3D; 0, validatorFunc; validatorFunc &#x3D; this.cache[i++]; ) &#123;
+        var msg &#x3D; validatorFunc(); &#x2F;&#x2F; 开始效验 并取得效验后的返回信息
+        if(msg) &#123;
+            return msg;
+        &#125;
+    &#125;
+&#125;;</code></pre><p>Validator类在这里作为Context，负责接收用户的请求并委托给strategys对象。上面的代码中，我们先创建一个Validator对象，然后通过validator.add方法往validator对象中添加一些效验规则，validator.add方法接收3个参数，如下代码：<br><strong>validator.add(registerForm.password,’minLength:6’,’密码长度不能小于6位’)</strong><br><strong>registerForm.password：</strong>校验的input输入框dom节点；<br><strong>minLength:6：</strong>是以一个冒号隔开的字符串，冒号前面的minLength代表客户挑选的strategys对象，冒号后面的数字6表示在效验过程中所必须验证的参数，minLength:6的意思是效验 registerForm.password 这个文本输入框的value最小长度为6位；如果字符串中不包含冒号，说明效验过程中不需要额外的效验信息；<br><strong>第三个参数：</strong>当效验未通过时返回的错误信息；</p><p>当我们往validator对象里添加完一系列的效验规则之后，会调用validator.start()方法来启动效验。如果validator.start()返回了一个errorMsg字符串作为返回值，说明该次效验没有通过，此时需要registerForm.onsubmit方法返回false来阻止表单提交。下面我们来看看初始化代码如下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var validateFunc &#x3D; function()&#123;
+    var validator &#x3D; new Validator(); &#x2F;&#x2F; 创建一个Validator对象
+    &#x2F;* 添加一些效验规则 *&#x2F;
+    validator.add(registerForm.userName,&#39;isNotEmpty&#39;,&#39;用户名不能为空&#39;);
+    validator.add(registerForm.password,&#39;minLength:6&#39;,&#39;密码长度不能小于6位&#39;);
+    validator.add(registerForm.userName,&#39;mobileFormat&#39;,&#39;手机号码格式不正确&#39;);
+
+    var errorMsg &#x3D; validator.start(); &#x2F;&#x2F; 获得效验结果
+    return errorMsg; &#x2F;&#x2F; 返回效验结果
+&#125;;
+var registerForm &#x3D; document.getElementById(&quot;registerForm&quot;);
+registerForm.onsubmit &#x3D; function()&#123;
+    var errorMsg &#x3D; validateFunc();
+    if(errorMsg)&#123;
+        alert(errorMsg);
+        return false;
+    &#125;
+&#125;</code></pre><p>下面是所有的代码如下：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">var strategys &#x3D; &#123;
+    isNotEmpty: function(value,errorMsg) &#123;
+        if(value &#x3D;&#x3D;&#x3D; &#39;&#39;) &#123;
+            return errorMsg;
+        &#125;
+    &#125;,
+    &#x2F;&#x2F; 限制最小长度
+    minLength: function(value,length,errorMsg) &#123;
+        if(value.length &lt; length) &#123;
+            return errorMsg;
+        &#125;
+    &#125;,
+    &#x2F;&#x2F; 手机号码格式
+    mobileFormat: function(value,errorMsg) &#123;
+        if(!&#x2F;(^1[3|5|8][0-9]&#123;9&#125;$)&#x2F;.test(value)) &#123;
+            return errorMsg;
+        &#125;
+    &#125; 
+&#125;;
+var Validator &#x3D; function()&#123;
+    this.cache &#x3D; [];  &#x2F;&#x2F; 保存效验规则
+&#125;;
+Validator.prototype.add &#x3D; function(dom,rule,errorMsg) &#123;
+    var str &#x3D; rule.split(&quot;:&quot;);
+    this.cache.push(function()&#123;
+        &#x2F;&#x2F; str 返回的是 minLength:6 
+        var strategy &#x3D; str.shift();
+        str.unshift(dom.value); &#x2F;&#x2F; 把input的value添加进参数列表
+        str.push(errorMsg);  &#x2F;&#x2F; 把errorMsg添加进参数列表
+        return strategys[strategy].apply(dom,str);
+    &#125;);
+&#125;;
+Validator.prototype.start &#x3D; function()&#123;
+    for(var i &#x3D; 0, validatorFunc; validatorFunc &#x3D; this.cache[i++]; ) &#123;
+        var msg &#x3D; validatorFunc(); &#x2F;&#x2F; 开始效验 并取得效验后的返回信息
+        if(msg) &#123;
+            return msg;
+        &#125;
+    &#125;
+&#125;;
+
+var validateFunc &#x3D; function()&#123;
+    var validator &#x3D; new Validator(); &#x2F;&#x2F; 创建一个Validator对象
+    &#x2F;* 添加一些效验规则 *&#x2F;
+    validator.add(registerForm.userName,&#39;isNotEmpty&#39;,&#39;用户名不能为空&#39;);
+    validator.add(registerForm.password,&#39;minLength:6&#39;,&#39;密码长度不能小于6位&#39;);
+    validator.add(registerForm.userName,&#39;mobileFormat&#39;,&#39;手机号码格式不正确&#39;);
+
+    var errorMsg &#x3D; validator.start(); &#x2F;&#x2F; 获得效验结果
+    return errorMsg; &#x2F;&#x2F; 返回效验结果
+&#125;;
+var registerForm &#x3D; document.getElementById(&quot;registerForm&quot;);
+registerForm.onsubmit &#x3D; function()&#123;
+    var errorMsg &#x3D; validateFunc();
+    if(errorMsg)&#123;
+        alert(errorMsg);
+        return false;
+    &#125;
+&#125;;</code></pre></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/04/53999.html" class="pre-post btn btn-default" title="跨页面通信的几种方法"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">跨页面通信的几种方法</span> </a><a href="/blog/2018/04/40445.html" class="next-post btn btn-default" title="数据结构与算法"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">数据结构与算法</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

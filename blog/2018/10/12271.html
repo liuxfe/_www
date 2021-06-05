@@ -1,0 +1,192 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="Java"><meta name="description" content="概述定义枚举（enum全称为enumeration）类型是Java 5新增的类型，存放在java.lang包中，允许用常量来表示特定的数据片断，而且全部都以类型安全的形式来表示。
+定义格式 创建..."><title>你需要知道的Java枚举知识 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="你需要知道的Java枚举知识">你需要知道的Java枚举知识</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/%E5%90%8E%E7%AB%AF/">后端</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/Java/" rel="tag">Java</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/10/27</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 951</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p><strong>枚举</strong>（<code>enum</code>全称为<code>enumeration</code>）类型是<code>Java 5</code>新增的类型，存放在<code>java.lang</code>包中，允许用常量来表示特定的数据片断，而且全部都以类型安全的形式来表示。</p><h3 id="定义格式"><a href="#定义格式" class="headerlink" title="定义格式"></a>定义格式</h3><p>创建枚举类型要使用<code>enum</code>关键字，隐含了所创建的类型都是<code>java.lang.Enum</code>类的子类（<code>java.lang.Enum</code>是一个抽象类）。枚举类型符合通用模式<code>Class Enum&lt;E extends Enum&lt;E&gt;&gt;</code>，而<code>E</code>表示枚举类型的名称。枚举类型的每一个值都将映射到<code>protected Enum(String name, int ordinal)</code>构造函数中。在这里每个值的名称都被转换成一个字符串，并且序数设置表示了此设置被创建的顺序。</p><p>枚举类的定义格式如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">enum 类名 &#123;
+
+&#x2F;&#x2F;枚举值
+
+&#125;</code></pre><h3 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h3><ul><li>需要的数据不能是任意的，而必须是一定范围内的值</li><li>枚举类也是一个特殊的类，构造方法默认的修饰符是<code>private</code>的</li><li>枚举值默认的修饰符是<code>public static final</code>，必须要位于枚举类的第一个语句</li><li>枚举类可以定义自己的成员变量、成员函数和带参构造方法，自定义带参构造方法时，枚举值需要传参</li><li>枚举类可以存在抽象的方法，但是枚举值必须要实现抽象的方法</li><li>可以使用<code>==</code>来比较枚举实例</li></ul><h3 id="常用方法"><a href="#常用方法" class="headerlink" title="常用方法"></a>常用方法</h3><p>枚举中的一些常用方法如下：</p><ul><li><code>int ordinal()</code>：返回枚举常量的序数（它在枚举声明中的位置，其中初始常量序数为零）。</li><li><code>String name()</code>：返回此枚举常量的名称。</li><li><code>String toString()</code>：返回覆盖枚举常量的<code>toString()</code>方法的值。</li><li><code>int compareTo(E o)</code>：比较此枚举与指定对象的顺序。</li><li><code>Class&lt;E&gt; getDeclaringClass()</code>：返回与此枚举常量的枚举类型相对应的 Class 对象。</li><li><code>static &lt;T extends Enum&lt;T&gt;&gt; T valueOf(Class&lt;T&gt; enumType, String name)</code>：返回指定名称的枚举常量指定的enumtype的方法。如：<code>ColorEnum color = ColorEnum.valueOf(&quot;RED&quot;);</code>。</li></ul><h2 id="主要应用"><a href="#主要应用" class="headerlink" title="主要应用"></a>主要应用</h2><h3 id="表达常量"><a href="#表达常量" class="headerlink" title="表达常量"></a>表达常量</h3><p>在<code>Java 5</code>之前，定义常量的最佳方式是在<code>final</code>修饰的常量类中定义：<code>public static fianl...</code>修饰的属性，且须将构造方法设为<code>private</code>。代码示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public final class ColorConst &#123;
+
+    public static final int RED &#x3D; 1;
+    public static final int GREEN &#x3D; 2;
+    public static final int BLUE &#x3D; 3;
+
+    private ColorConst() &#123;&#125;
+
+&#125;</code></pre><p>但，<strong>不建议在接口中定义常量</strong>。在<code>《Effective Java》</code>一书中提到过：</p><blockquote><p><strong>The constant interface pattern is a poor use of interfaces</strong>. That a class uses some constants internally is an implementation detail. Implementing a constant interface causes this implementation detail to leak into the class’s exported API. It is of no consequence to the users of a class that the class implements a constant interface. In fact, it may even confuse them. Worse, it represents a commitment: if in a future release the class is modified so that it no longer needs to use the constants, it still must implement the interface to ensure binary compatibility. If a nonfinal class implements a constant interface, all of its subclasses will have their namespaces polluted by the constants in the interface.There are several constant interfaces in the java platform libraries, such as java.io.ObjectStreamConstants. These interfaces should be regarded as anomalies and should not be emulated.</p></blockquote><p>大意是：<strong>如果某个实现了常量接口的类被修改不再需要常量了，也会因为序列化兼容原因不得不保持该实现，而且非<code>final</code>类实现常量接口会导致所有子类被污染</strong>。</p><p>现在好了，有了枚举，可以把相关的常量分组到一个枚举类型里，而且枚举提供了比常量更多的方法。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public enum ColorEnum &#123;
+
+    RED, GREEN, BLUE
+
+&#125;</code></pre><blockquote><p><strong>注意</strong>：枚举类的名称一般以<code>Enum</code>结尾，比如<code>ColorEnum</code>等。如果你写个枚举类，取名为<code>Color</code>，那么没人能快速知道它是一个枚举类。</p></blockquote><h3 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h3><p>Java 中使用<code>values()</code>方法将枚举所有元素item转换成一个数组。这样就可以通过<code>foreach</code>语法来遍历枚举中的所有元素了。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">for (ColorEnum color: ColorEnum.values()) &#123;
+    log.info(&quot;ordinal:&#123;&#125;, name:&#123;&#125;&quot;, color.ordinal(), color.name());
+&#125;</code></pre><p>输出结果；</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">ordinal:0, name:RED
+ordinal:1, name:GREEN
+ordinal:2, name:BLUE</code></pre><h3 id="switch"><a href="#switch" class="headerlink" title="switch"></a>switch</h3><p>在<code>JDK7</code>之前，String字符串是不支持通过<code>switch</code>语法来筛选数据，但是 Java 为枚举提供了<code>switch</code>语法的支持。使用示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;&#x2F; 客户端传来的枚举item
+ColorEnum color &#x3D; ColorEnum.GREEN;
+
+switch (color) &#123;
+    case RED: log.info(&quot;进入了 RED 的分支&quot;);
+        break;
+    case GREEN: log.info(&quot;进入了 GREEN 的分支&quot;);
+        break;
+    case BLUE: log.info(&quot;进入了 BLUE 的分支&quot;);
+        break;
+    default: log.info(&quot;进入了 default 的分支&quot;);
+&#125;</code></pre><p>输出结果：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">进入了 GREEN 的分支</code></pre><blockquote><p><strong>注意</strong>：<code>switch</code>后已经指定了枚举的类型，<code>case</code>后无须再使用全名<code>ColorEnum</code>。</p></blockquote><h3 id="自定义属性和方法"><a href="#自定义属性和方法" class="headerlink" title="自定义属性和方法"></a>自定义属性和方法</h3><p>Java枚举中允许定义属性和方法，但必须在枚举实例序列的最后一个分号后再添加。Java 要求必须先定义枚举实例在前面，使用示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * 关于颜色的枚举.
+ * @author blinkfox on 2017&#x2F;9&#x2F;17.
+ *&#x2F;
+public enum ColorEnum &#123;
+
+    RED(1, &quot;红色&quot;), GREEN(2, &quot;绿色&quot;), BLUE(3, &quot;蓝色&quot;);
+
+    &#x2F;** 颜色的code. *&#x2F;
+    private int code;
+
+    &#x2F;** 颜色的名称. *&#x2F;
+    private String name;
+
+    &#x2F;**
+     * 枚举的构造方法默认且只能是private的.
+     * @param code 代码值
+     * @param name 名称
+     *&#x2F;
+    ColorEnum(int code, String name) &#123;
+        this.code &#x3D; code;
+        this.name &#x3D; name;
+    &#125;
+
+    &#x2F;**
+     * 根据颜色的code值获取到对应的名称.
+     * @param code 颜色code
+     * @return 颜色名称
+     *&#x2F;
+    public static String getNameByCode(int code) &#123;
+        for (ColorEnum color: ColorEnum.values()) &#123;
+            if (color.code &#x3D;&#x3D; code) &#123;
+                return color.name;
+            &#125;
+        &#125;
+        return null;
+    &#125;
+
+    &#x2F;**
+     * 覆盖的toString方法.
+     * @return 字符串
+     *&#x2F;
+    @Override
+    public String toString() &#123;
+        return this.code + &quot;:&quot; + this.name;
+    &#125;
+
+    &#x2F;* getter方法. *&#x2F;
+
+    public int getCode() &#123;
+        return code;
+    &#125;
+
+    public String getName() &#123;
+        return name;
+    &#125;
+
+&#125;</code></pre><blockquote><p><strong>注意</strong>：枚举的构造方法默认且只能是<code>private</code>的。</p></blockquote><h3 id="使用枚举来表达多态"><a href="#使用枚举来表达多态" class="headerlink" title="使用枚举来表达多态"></a>使用枚举来表达多态</h3><p>所有的枚举都继承自<code>java.lang.Enum</code>类。由于 Java 不支持多继承，所以枚举不能再继承其他类。但枚举类中可以定义抽象方法，也可以实现一个或者多个接口。由于每一个枚举值会呈现出不同的行为方式，则须要让每个枚举值分别实现方法。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * 关于颜色的枚举.
+ * @author blinkfox on 2017&#x2F;9&#x2F;17.
+ *&#x2F;
+public enum ColorEnum &#123;
+
+    RED(1, &quot;红色&quot;) &#123;
+        @Override
+        public void paint() &#123;
+            log.info(&quot;使用了&#39;红色&#39;颜料来喷漆&quot;);
+        &#125;
+    &#125;,
+
+    GREEN(2, &quot;绿色&quot;) &#123;
+        @Override
+        public void paint() &#123;
+            log.info(&quot;使用了&#39;绿色&#39;颜料来喷漆&quot;);
+        &#125;
+    &#125;,
+
+    BLUE(3, &quot;蓝色&quot;) &#123;
+        @Override
+        public void paint() &#123;
+            log.info(&quot;使用了&#39;蓝色&#39;颜料来喷漆&quot;);
+        &#125;
+    &#125;;
+
+    private static final Logger log &#x3D; LoggerFactory.getLogger(ColorEnum.class);
+
+    &#x2F;** 颜色的code. *&#x2F;
+    private int code;
+
+    &#x2F;** 颜色的名称. *&#x2F;
+    private String name;
+
+    &#x2F;**
+     * 枚举的构造方法默认且只能是private的.
+     * @param code 代码值
+     * @param name 名称
+     *&#x2F;
+    ColorEnum(int code, String name) &#123;
+        this.code &#x3D; code;
+        this.name &#x3D; name;
+    &#125;
+
+    &#x2F;**
+     * 使用不同的颜色来喷漆的抽象方法.
+     *&#x2F;
+    public abstract void paint();
+
+    &#x2F;**
+     * 根据颜色的code值获取到对应的名称.
+     * @param code 颜色code
+     * @return 颜色名称
+     *&#x2F;
+    public static String getNameByCode(int code) &#123;
+        for (ColorEnum color: ColorEnum.values()) &#123;
+            if (color.code &#x3D;&#x3D; code) &#123;
+                return color.name;
+            &#125;
+        &#125;
+        return null;
+    &#125;
+
+    &#x2F;* getter方法. *&#x2F;
+
+    public int getCode() &#123;
+        return code;
+    &#125;
+
+    public String getName() &#123;
+        return name;
+    &#125;
+
+    &#x2F;**
+     * 覆盖的toString方法.
+     * @return 字符串
+     *&#x2F;
+    @Override
+    public String toString() &#123;
+        return this.code + &quot;:&quot; + this.name;
+    &#125;
+
+&#125;</code></pre><h3 id="枚举集合的使用"><a href="#枚举集合的使用" class="headerlink" title="枚举集合的使用"></a>枚举集合的使用</h3><p>Java 中提供了两个方便操作<code>enum</code>的集合类：<code>java.util.EnumSet</code>和<code>java.util.EnumMap</code>。<code>EnumSet</code>保证集合中的元素不重复；<code>EnumMap</code>中的<code>key</code>是<code>enum</code>类型且不能为<code>null</code>，而<code>value</code>则可以是任意类型。<code>EnumSet</code>和<code>EnumMap</code>内部以数组来实现，性能更好。</p><p>以下是<code>EnumMap</code>的使用示例：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">EnumMap&lt;ColorEnum, String&gt; colorEnumMap &#x3D; new EnumMap&lt;ColorEnum, String&gt;(ColorEnum.class);
+colorEnumMap.put(ColorEnum.RED, &quot;这是EnumMap中的&#39;RED&#39;&quot;);
+colorEnumMap.put(ColorEnum.GREEN, &quot;这是EnumMap中的&#39;GREEN&#39;&quot;);
+colorEnumMap.put(ColorEnum.BLUE, &quot;这是EnumMap中的&#39;BLUE&#39;&quot;);
+
+log.info(&quot;&#123;&#125;&quot;, colorEnumMap);</code></pre><p>输出结果：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">&#123;1:红色&#x3D;这是EnumMap中的&#39;RED&#39;, 2:绿色&#x3D;这是EnumMap中的&#39;GREEN&#39;, 3:蓝色&#x3D;这是EnumMap中的&#39;BLUE&#39;&#125;</code></pre><h3 id="枚举单例"><a href="#枚举单例" class="headerlink" title="枚举单例"></a>枚举单例</h3><p>在<code>《Effective Java》</code>一书中强烈推荐<strong>使用枚举来实现单例模式</strong>，同时枚举单例代码也最为简单：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public enum ColorEnumSingleton &#123;
+
+    INSTANCE;
+
+    public static void doSomething()&#123;
+        &#x2F;&#x2F; do something
+    &#125;
+
+&#125;</code></pre><p>使用枚举单例有以下好处：</p><ul><li>自由序列化</li><li>保证只有一个实例（即使使用反射机制也无法多次实例化一个枚举量）</li><li>线程安全</li></ul><blockquote><p><strong>注意</strong>：枚举单例是<strong>饿汉</strong>式的。</p></blockquote><h3 id="枚举策略"><a href="#枚举策略" class="headerlink" title="枚举策略"></a>枚举策略</h3><p>在使用 Java 的枚举时往往会结合<code>Switch</code>来进行判断以实现不同值的处理，但是我们知道多用<code>switch</code>不是一种很好的代码风格，不利用维护和适应变化，因为这不符合<strong>开闭原则</strong>。为此一种方法是用<strong>策略模式</strong>来重构原有的枚举实现。在<code>《Effective Java》</code>一书中提出了一种<strong>枚举策略模式</strong>很好的解决了这个问题。</p><p>具体使用方法和前面所讲的<strong>使用枚举来表达多态</strong>一节中的示例一样，这里就不再举例说明了。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul><li>枚举类也是一个特殊的类，构造方法默认的修饰符是<code>private</code>（不管写不写）的，它们都可以定义一些属性和方法，但是不能使用<code>extends</code>关键字继承其他类，因为<code>enum</code>已经继承了<code>java.lang.Enum</code>（java是单一继承）。</li><li>枚举类中可以定义抽象方法，也可以实现一个或者多个接口。</li><li>使用枚举大大加强了程序的可读性、易用性和可维护性，并且可在此基础之上进行了扩展，使之可以像类一样去使用，更是为 Java 对离散量的表示上升了一个台阶。</li><li>枚举最大的缺点是：<strong>相对于普通的常量会占用更多的内存</strong>。所以，我还是不建议大面积的使用枚举来替代整形常量。但是如果这些常量还有关联属性或者行为等，那么强烈推荐使用枚举类型。<strong>使用枚举类型的性能几乎是使用静态类的16倍</strong>。</li><li>枚举类型对象之间的值比较，可以使用<code>==</code>直接来比较值是否相等的，不是必须使用<code>equals</code>方法。</li><li>推荐使用<strong>枚举单例</strong>来实现单例模式，可以使用<strong>枚举策略</strong>来简化策略模式。</li></ul></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/10/43025.html" class="pre-post btn btn-default" title="Java异常知识汇总"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">Java异常知识汇总</span> </a><a href="/blog/2018/10/672.html" class="next-post btn btn-default" title="Java集合框架知识整理"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">Java集合框架知识整理</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

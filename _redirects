@@ -1,0 +1,11 @@
+http://twuu.liuxfe.com/*   https://twuu234.netlify.app/:splat 301!
+http://zwiki.liuxfe.com/*  https://zhwiki.netlify.app/:splat  301!
+
+https://twuu.liuxfe.com/*  https://twuu234.netlify.app/:splat 301!
+https://zwiki.liuxfe.com/* https://zhwiki.netlify.app/:splat  301!
+
+
+/linux-command/*    https://man.liuxfe.com/:splat  301!
+
+/blog/tags/*        /blog/tagged/:splat   301!
+/blog/categories/*  /blog/category/:splat 301!

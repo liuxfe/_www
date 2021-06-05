@@ -1,0 +1,408 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="Java"><meta name="description" content="前言最近在一个项目中遇到导出为Word文件的问题，导出Word的功能很简单，但是导出Word文件中包含数据库动态查询的统计数据而生成的Echarts图片，且导出Word的时机又是在凌晨的服务器定..."><title>使用Java调用PhantomJS动态导出ECharts图片到Word文件中 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="使用Java调用PhantomJS动态导出ECharts图片到Word文件中">使用Java调用PhantomJS动态导出ECharts图片到Word文件中</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/%E5%90%8E%E7%AB%AF/">后端</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/Java/" rel="tag">Java</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/10/01</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 977</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在一个项目中遇到导出为Word文件的问题，导出Word的功能很简单，但是导出Word文件中包含数据库动态查询的统计数据而生成的Echarts图片，且导出Word的时机又是在凌晨的服务器定时执行，所以不能通过客户端访问统计页面时再去生成。</p><p>服务端语言使用Java语言，最开始考虑使用<a target="_blank" rel="noopener external nofollow noreferrer" href="http://www.jfree.org/jfreechart/index.html">JFreeChart</a>来生成统计图片，但是JFreeChart生成的图片很丑，且和ECharts的统计图效果截然不同。所以最终抛弃了使用<code>JFreeChart</code>，而采用了在服务端使用Java调用<a target="_blank" rel="noopener external nofollow noreferrer" href="http://phantomjs.org/">PhantomJS</a>的指令来导出Ehcarts图片。所以主要的技术方案选型如下：</p><ul><li><code>poi-tl</code>，一个简单的基于<code>Word</code>模版生成<code>Word</code>的工具。</li><li><code>PhantomJS</code>，一个基于<code>webkit</code>内核的无头浏览器，可在服务端程序实现加载、操作页面等功能</li></ul><h2 id="使用poi-tl导出Word"><a href="#使用poi-tl导出Word" class="headerlink" title="使用poi-tl导出Word"></a>使用poi-tl导出Word</h2><h3 id="poi-tl介绍"><a href="#poi-tl介绍" class="headerlink" title="poi-tl介绍"></a>poi-tl介绍</h3><p>使用Java导出Word通常采用的是<a target="_blank" rel="noopener external nofollow noreferrer" href="https://poi.apache.org/">Apache POI</a>的库，但是使用POI来导出Word，会书写大量的段落、样式等细节代码，代码量巨大，而且不易于维护。通过<a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/Sayi/poi-tl">poi-tl</a>只需要制作导出的模版，服务端一行代码调用，传入模版路径和<code>Map</code>或者<code>Bean</code>即可生成Word模版，代码量大大降低，以后导出样式不满意的时候，只需要修改Word模版文件即可。</p><blockquote><p><strong>注意</strong>：<code>poi-tl</code>只能生成<code>docx</code>文件，对word2007之前的<code>doc</code>文档则不支持。</p></blockquote><h3 id="Maven引入"><a href="#Maven引入" class="headerlink" title="Maven引入"></a>Maven引入</h3><pre class="line-numbers language-xml" data-language="xml"><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.deepoove&lt;&#x2F;groupId&gt;
+    &lt;artifactId&gt;poi-tl&lt;&#x2F;artifactId&gt;
+    &lt;version&gt;1.0.0&lt;&#x2F;version&gt;
+&lt;&#x2F;dependency&gt;</code></pre><blockquote><p><strong>注</strong>：该包带入了<code>POI3.16</code>，如果系统中本身有低于<code>3.15</code>版本的<code>POI</code>，需要排除掉，否则生成Word时会报错。</p></blockquote><h3 id="demo示例"><a href="#demo示例" class="headerlink" title="demo示例"></a>demo示例</h3><p>首先，制作一个用于测试的word模版，使用<code>poi-tl</code>的标记语法做如下标记，如下图所示：</p><p><img src="http://static.blinkfox.com/test_word_template.jpg" alt="测试word模版"></p><p>然后，构造一个需要渲染的model JavaBean类，如果有多个Bean，貌似只能通过继承来复用属性，采用组合的方式是渲染不了的，代码如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * BaseProp
+ * @author blinkfox on 2017-06-28.
+ *&#x2F;
+public class BaseProp &#123;
+    
+    protected String baseProp;
+    
+    &#x2F;**
+     * 构造方法.
+     * @param baseProp 基础属性
+     *&#x2F;
+    public BaseProp() &#123;
+        super();
+    &#125;
+
+    public String getBaseProp() &#123;
+        return baseProp;
+    &#125;
+
+    public void setBaseProp(String baseProp) &#123;
+        this.baseProp &#x3D; baseProp;
+    &#125;
+    
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * 测试旅游信息的bean.
+ * @author blinkfox on 2017-06-28.
+ *&#x2F;
+public class Travel extends BaseProp &#123;
+
+    private String title;
+
+    private String smallTitle;
+
+    private String startDate;
+
+    private String endDate;
+
+    private int count;
+
+    private double money;
+
+    private String place1;
+
+    private String place2;
+
+    private PictureRenderData pic;
+
+    &#x2F;**
+     * 构造方法.
+     *&#x2F;
+    public Travel() &#123;
+        super();
+    &#125;
+
+    &#x2F;*getter和setter方法.*&#x2F;
+
+    public String getTitle() &#123;
+        return title;
+    &#125;
+
+    public void setTitle(String title) &#123;
+        this.title &#x3D; title;
+    &#125;
+
+    public String getSmallTitle() &#123;
+        return smallTitle;
+    &#125;
+
+    public void setSmallTitle(String smallTitle) &#123;
+        this.smallTitle &#x3D; smallTitle;
+    &#125;
+
+    public String getStartDate() &#123;
+        return startDate;
+    &#125;
+
+    public void setStartDate(String startDate) &#123;
+        this.startDate &#x3D; startDate;
+    &#125;
+
+    public String getEndDate() &#123;
+        return endDate;
+    &#125;
+
+    public void setEndDate(String endDate) &#123;
+        this.endDate &#x3D; endDate;
+    &#125;
+
+    public int getCount() &#123;
+        return count;
+    &#125;
+
+    public void setCount(int count) &#123;
+        this.count &#x3D; count;
+    &#125;
+
+    public double getMoney() &#123;
+        return money;
+    &#125;
+
+    public void setMoney(double money) &#123;
+        this.money &#x3D; money;
+    &#125;
+
+    public String getPlace1() &#123;
+        return place1;
+    &#125;
+
+    public void setPlace1(String place1) &#123;
+        this.place1 &#x3D; place1;
+    &#125;
+
+    public String getPlace2() &#123;
+        return place2;
+    &#125;
+
+    public void setPlace2(String place2) &#123;
+        this.place2 &#x3D; place2;
+    &#125;
+
+    public PictureRenderData getPic() &#123;
+        return pic;
+    &#125;
+
+    public void setPic(PictureRenderData pic) &#123;
+        this.pic &#x3D; pic;
+    &#125;
+
+&#125;</code></pre><p>最后，是模拟调用示例：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * poi-tl库的使用示例.
+ * Created by blinkfox on 2017&#x2F;6&#x2F;27.
+ *&#x2F;
+public class PoitlTest &#123;
+
+    private static final Logger log &#x3D; LoggerFactory.getLogger(PoitlTest.class);
+
+    &#x2F;** 项目资源路径. *&#x2F;
+    private static final String PATH &#x3D; &quot;F:&#x2F;poitl-test&#x2F;web&quot;;
+
+    &#x2F;** word模板路径. *&#x2F;
+    private static final String DOC_PATH &#x3D; PATH + &quot;&#x2F;template&#x2F;test&#x2F;test.docx&quot;;
+
+    &#x2F;** 图片路径. *&#x2F;
+    private static final String PIC_PATH &#x3D; PATH + &quot;&#x2F;template&#x2F;test&#x2F;pic.png&quot;;
+
+    &#x2F;** 输出文件及路径. *&#x2F;
+    private static final String OUTPUT_PATH &#x3D; &quot;G:&#x2F;test&#x2F;poitl_out_word.docx&quot;;
+
+    &#x2F;**
+     * 构造Bean型的data数据.
+     * @return map
+     *&#x2F;
+    private static Travel buildBeanData() &#123;
+        Travel travel &#x3D; new Travel();
+        travel.setTitle(&quot;我的旅游日记&quot;);
+        travel.setSmallTitle(&quot;再写日记&quot;);
+        travel.setStartDate(&quot;2017-01-01&quot;);
+        travel.setEndDate(&quot;2017-06-28&quot;);
+        travel.setCount(3);
+        travel.setPlace1(&quot;九寨沟&quot;);
+        travel.setPlace2(&quot;天涯海角&quot;);
+        travel.setMoney(1872.52);
+        travel.setPic(new PictureRenderData(600, 400, PIC_PATH));
+        travel.setBaseProp(&quot;这是&quot;);
+        return travel;
+    &#125;
+
+    &#x2F;**
+     * main方法.
+     * @param args 数组参数
+     *&#x2F;
+    public static void main(String[] args) throws IOException &#123;
+        XWPFTemplate template &#x3D; XWPFTemplate.compile(DOC_PATH).render(buildBeanData());
+
+        FileOutputStream out &#x3D; new FileOutputStream(OUTPUT_PATH);
+        template.write(out);
+        out.flush();
+        out.close();
+        template.close();
+        log.info(&quot;通过&#39;poi-tl&#39;导出word成功!&quot;);
+    &#125;
+
+&#125;</code></pre><p>最后，在导出的文件夹中可查看生成的word文件，如下所示：</p><p><img src="http://static.blinkfox.com/test_out_result.jpg" alt="生成的Word文件结果"></p><h2 id="Java调用PhantomJS导出Ehcarts图片"><a href="#Java调用PhantomJS导出Ehcarts图片" class="headerlink" title="Java调用PhantomJS导出Ehcarts图片"></a>Java调用PhantomJS导出Ehcarts图片</h2><h3 id="PhantomJS介绍"><a href="#PhantomJS介绍" class="headerlink" title="PhantomJS介绍"></a>PhantomJS介绍</h3><p><code>PhantomJS</code>是一个基于<code>webkit</code>内核的无头浏览器，即没有UI界面的一个浏览器，只是其内的点击、翻页等人为相关操作需要程序设计实现。<code>PhantomJS</code>提供JavaScript API接口，即通过编写js程序可以直接与<code>webkit</code>内核交互，在此之上可以结合Java语言等，通过java调用js等相关操作，从而解决了以前<code>c/c++</code>才能比较好的基于<code>webkit</code>开发优质采集器的限制。</p><h3 id="PhantomJS的安装配置"><a href="#PhantomJS的安装配置" class="headerlink" title="PhantomJS的安装配置"></a>PhantomJS的安装配置</h3><h4 id="windows环境"><a href="#windows环境" class="headerlink" title="windows环境"></a>windows环境</h4><p>如果是在windows环境下，则在官网下载解压到某个目录后，将其bin目录加入到<code>path</code>变量中即可。</p><h4 id="Linux环境"><a href="#Linux环境" class="headerlink" title="Linux环境"></a>Linux环境</h4><p>如果是在<code>Linux</code>环境下，在官网下载解压后，同样需要将<code>PhantomJS</code>的<code>bin</code>目录加入到<code>path</code>环境变量中，参考的命令和配置如下：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"># 编辑配置文件.
+vi ~&#x2F;.bashrc
+
+# 将PhantomJS的bin目录加入到PATH环境变量中.
+export PHANTOMJS_HOME&#x3D;&#x2F;home&#x2F;blinkfox&#x2F;Documents&#x2F;phantomjs-2.1.1-linux-x86_64
+export PATH&#x3D;$&#123;PHANTOMJS_HOME&#125;&#x2F;bin:$PATH
+
+# 退出vi编辑器，使用source命令让刚才的配置即时生效.
+source ~&#x2F;.bashrc
+
+# 测试PhantomJS是否安装成功，如果打出了版本信息，即安装成功.
+phantomjs -v</code></pre><h3 id="demo示例-1"><a href="#demo示例-1" class="headerlink" title="demo示例"></a>demo示例</h3><p>这个demo的需求是这样的，我们使用Java调用<code>PhantomJS</code>的指令来在服务端加载含<code>ECharts</code>统计的图<code>html</code>文件，然后调用<code>ECharts</code>的生成图片方法，将图片传输到Java后台最终实现保存图片到指定路径中。</p><p>首先，制作<code>ECharts</code>的html页面，示例页面如下代码如下：</p><pre class="line-numbers language-html" data-language="html"><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset&#x3D;&quot;UTF-8&quot;&gt;
+&lt;title&gt;测试的ECharts数据统计图&lt;&#x2F;title&gt;
+&lt;&#x2F;head&gt;
+&lt;body&gt;
+    &lt;!-- 为 ECharts 准备一个具备大小（宽高）的 DOM --&gt;
+    &lt;div id&#x3D;&quot;main&quot; style&#x3D;&quot;width:560px; height:270px;&quot;&gt;&lt;&#x2F;div&gt;
+
+&lt;script type&#x3D;&quot;text&#x2F;javascript&quot; src&#x3D;&quot;&#x2F;js&#x2F;lib&#x2F;jquery&#x2F;jquery-1.9.1.min.js&quot;&gt;&lt;&#x2F;script&gt;
+&lt;script type&#x3D;&quot;text&#x2F;javascript&quot; src&#x3D;&quot;&#x2F;js&#x2F;lib&#x2F;echarts&#x2F;v3&#x2F;echarts.min.js&quot;&gt;&lt;&#x2F;script&gt;
+&lt;script type&#x3D;&quot;text&#x2F;javascript&quot;&gt;
+
+&#x2F;&#x2F; 基于准备好的dom，初始化echarts实例
+var myChart &#x3D; echarts.init(document.getElementById(&#39;main&#39;));
+
+&#x2F;&#x2F; 指定图表的配置项和数据
+var option &#x3D; &#123;
+    title: &#123;
+        text: &#39;ECharts 入门示例&#39;
+    &#125;,
+    animation: false, &#x2F;&#x2F; 关闭动画效果
+    tooltip: &#123;&#125;,
+    legend: &#123;
+        data:[&#39;销量&#39;]
+    &#125;,
+    xAxis: &#123;
+        data: [&quot;衬衫&quot;,&quot;羊毛衫&quot;,&quot;雪纺衫&quot;,&quot;裤子&quot;,&quot;高跟鞋&quot;,&quot;袜子&quot;]
+    &#125;,
+    yAxis: &#123;&#125;,
+    series: [&#123;
+        name: &#39;销量&#39;,
+        type: &#39;bar&#39;,
+        data: [5, 20, 36, 10, 10, 20]
+    &#125;]
+&#125;;
+
+&#x2F;&#x2F; 使用刚指定的配置项和数据显示图表。
+myChart.setOption(option);
+
+&#x2F;**
+ * ajax传输图片信息.
+ *&#x2F;
+function postImage() &#123;
+    &#x2F;&#x2F; 向后台发起请求保存图片到指定目录.
+    $.ajax(&#123;
+        type: &#39;POST&#39;,
+        url: &#39;&#x2F;test&#x2F;saveImage&#39;,
+        data: &#123;picInfo: myChart.getDataURL()&#125;,
+        success: function() &#123;
+            console.log(&#39;通过post请求传输数据成功!&#39;);
+        &#125;
+    &#125;);
+&#125;
+&lt;&#x2F;script&gt;
+&lt;&#x2F;body&gt;
+&lt;&#x2F;html&gt;</code></pre><p>然后，使用<code>Servlet</code>来写一个服务端代码，用来获取<code>Base64</code>的图片信息并在后端解析保存图片，<code>Servlet</code>代码如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * 保存Echarts统计图片的Servlet.
+ * @author blinkfox on 2017-06-28.
+ *&#x2F;
+public class SaveImageServlet extends HttpServlet &#123;
+
+    private static final long serialVersionUID &#x3D; 1L;
+
+    private static final Logger log &#x3D; LoggerFactory.getLogger(SaveImageServlet.class);
+
+    &#x2F;**
+     * 执行获取echarts图片的post请求.
+     * @param request req
+     * @param response resp
+     * @throws ServletException Servlet异常.
+     * @throws IOException IO异常.
+     *&#x2F;
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException &#123;
+        &#x2F;&#x2F; 获取图片信息.
+        String picInfo &#x3D; request.getParameter(&quot;picInfo&quot;);
+        if (StringUtils.isBlank(picInfo)) &#123;
+            log.error(&quot;picInfo为空,未从前台获取到base64图片信息!&quot;);
+            return;
+        &#125;
+
+        this.getAndsaveImage(picInfo, &quot;G:&#x2F;test&#x2F;image1.png&quot;);
+    &#125;
+
+    &#x2F;**
+     * 获取并保存图片到本地.
+     * @param picInfo 图片信息
+     * @param imagePath 图片保存的路径
+     *&#x2F;
+    private void getAndsaveImage(String picInfo, String imagePath) &#123;
+        &#x2F;&#x2F; 传递过程中  &quot;+&quot; 变为了 &quot; &quot;.
+        String newPicInfo &#x3D; picInfo.replaceAll(&quot; &quot;, &quot;+&quot;);
+        String picPath &#x3D; decodeBase64(newPicInfo, new File(imagePath));
+        log.warn(&quot;从echarts中生成图片的的路径为:&#123;&#125;&quot;, picPath);
+    &#125;
+
+    &#x2F;**
+     * 解析Base64位信息并输出到某个目录下面.
+     * @param base64Info base64串
+     * @param picPath 生成的文件路径
+     * @return 文件地址
+     *&#x2F;
+    private String decodeBase64(String base64Info, File picPath) &#123;
+        if (StringUtils.isEmpty(base64Info)) &#123;
+            return null;
+        &#125;
+
+        &#x2F;&#x2F; 数据中：data:image&#x2F;png;base64,iVBORw0KGgoAAAANSUhEUgAABI4AAAEsCAYAAAClh&#x2F;jbAAA ...  在&quot;base64,&quot;之后的才是图片信息
+        String[] arr &#x3D; base64Info.split(&quot;base64,&quot;);
+
+        &#x2F;&#x2F; 将图片输出到系统某目录.
+        OutputStream out &#x3D; null;
+        try &#123;
+            &#x2F;&#x2F; 使用了Apache commons codec的包来解析Base64
+            byte[] buffer &#x3D; Base64.decodeBase64(arr[1]);
+            out &#x3D; new FileOutputStream(picPath);
+            out.write(buffer);
+        &#125; catch (IOException e) &#123;
+            log.error(&quot;解析Base64图片信息并保存到某目录下出错!&quot;, e);
+        &#125; finally &#123;
+            IOUtils.closeQuietly(out);
+        &#125;
+
+        return picPath;
+    &#125;
+
+&#125;</code></pre><p>然后，是书写PhantomJS脚本<code>echarts_load.js</code>来加载和调用图片下载的代码：</p><pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript">var system &#x3D; require(&#39;system&#39;);
+var page &#x3D; require(&#39;webpage&#39;).create();
+
+&#x2F;&#x2F; 如果是windows,设置编码为gbk，防止中文乱码,Linux本身是UTF-8
+var osName &#x3D; system.os.name;
+console.log(&#39;os name:&#39; + osName);
+if (&#39;windows&#39; &#x3D;&#x3D;&#x3D; osName.toLowerCase()) &#123;
+    phantom.outputEncoding&#x3D;&quot;gbk&quot;;
+&#125;
+
+&#x2F;&#x2F; 获取第二个参数(即请求地址url).
+var url &#x3D; system.args[1];
+console.log(&#39;url:&#39; + url);
+
+&#x2F;&#x2F; 显示控制台日志.
+page.onConsoleMessage &#x3D; function(msg, lineNum, sourceId) &#123;
+    console.log(&#39;CONSOLE: &#39; + msg + &#39; (from line #&#39; + lineNum + &#39; in &quot;&#39; + sourceId + &#39;&quot;)&#39;);
+&#125;;
+
+&#x2F;&#x2F;打开给定url的页面.
+var start &#x3D; new Date().getTime();
+page.open(url, function(status) &#123;
+    if (status &#x3D;&#x3D; &#39;success&#39;) &#123;
+        console.log(&#39;echarts页面加载完成,加载耗时:&#39; + (new Date().getTime() - start) + &#39; ms&#39;);
+
+        &#x2F;&#x2F; 由于echarts动画效果，延迟500毫秒确保图片渲染完毕再调用下载图片方法.
+        setTimeout(function() &#123;
+            page.evaluate(function() &#123;
+                postImage();
+                console.log(&quot;调用了echarts的下载图片功能.&quot;);
+            &#125;);
+        &#125;, 500);
+    &#125; else &#123;
+        console.log(&quot;页面加载失败 Page failed to load!&quot;);
+    &#125;
+
+    &#x2F;&#x2F; 3秒后再关闭浏览器.
+    setTimeout(function() &#123;
+        phantom.exit();
+    &#125;, 3000);
+&#125;);</code></pre><p>最后，是使用<code>Java</code>来调用<code>PhantomJS</code>的指令，代码如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * HttpTest.
+ * @author blinkfox on 2017-06-28.
+ * @version 1.0
+ *&#x2F;
+public class HttpTest &#123;
+
+    private static final Logger log &#x3D; LoggerFactory.getLogger(HttpTest.class);
+
+    private static final String PHANTOM_PATH &#x3D; &quot;phantomjs&quot;;
+
+    &#x2F;&#x2F;这里我的test.js是保存在G盘下面的phantomjs目录
+    private static final String TEST_JS &#x3D; &quot;G:&#x2F;test&#x2F;phantom&#x2F;test.js &quot;;
+
+    public void String downloadImage(String url) throws IOException &#123;
+        String cmdStr &#x3D; PHANTOM_PATH + TEST_JS + url;
+        log.info(&quot;命令行字符串:&#123;&#125;&quot;, cmdStr);
+
+        Runtime rt &#x3D; Runtime.getRuntime();
+        try &#123;
+            rt.exec(cmdStr);
+        &#125; catch (IOException e) &#123;
+            log.error(&quot;执行phantomjs的指令失败！请检查是否安装有PhantomJs的环境或配置path路径！PhantomJs详情参考这里:http:&#x2F;&#x2F;phantomjs.org&quot;, e);
+        &#125;
+    &#125;
+
+    &#x2F;**
+     * main.
+     * @param args args
+     * @throws IOException IO异常
+     *&#x2F;
+    public static void main(String[] args) throws IOException &#123;
+        downloadImage(&quot;http:&#x2F;&#x2F;127.0.0.1:8080&#x2F;test&#x2F;echart_test&#x2F;test_echarts.html&quot;);
+    &#125;
+
+&#125;</code></pre><p>通过调用测试代码即可在指定目录生成<code>Echarts</code>的图片啦！</p><p>联系上面生成<code>Word</code>的功能，两个功能一结合即可动态导出<code>ECharts</code>图片到<code>Word</code>文件中。</p></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/10/13548.html" class="pre-post btn btn-default" title="git 教程"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">git 教程</span> </a><a href="/blog/2018/10/54860.html" class="next-post btn btn-default" title="Jest 开发笔记"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">Jest 开发笔记</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

@@ -1,0 +1,220 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="wasm,webassembly"><meta name="description" content="前言
+WebAssembly（缩写为Wasm）是基于堆栈的虚拟机的二进制指令格式。Wasm被设计为可编程C/ C ++ /Rust等高级语言的可移植目标，可在Web上部署客户端和服务器应用程序。..."><title>一种Wasm逆向静态分析方法 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="一种Wasm逆向静态分析方法">一种Wasm逆向静态分析方法</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/%E5%89%8D%E7%AB%AF/">前端</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/wasm/" rel="tag">wasm</a> <a class="tag-none-link" href="/blog/tagged/webassembly/" rel="tag">webassembly</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2019/11/23</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 560</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote><p>WebAssembly（缩写为<em>Wasm</em>）是基于堆栈的虚拟机的二进制指令格式。Wasm被设计为可编程C/ C ++ /Rust等高级语言的可移植目标，可在Web上部署客户端和服务器应用程序。</p></blockquote><p>随着wasm的逐渐流行，在最近的ctf比赛中出现了很多wasm类型的逆向题。没接触过wasm的人会比较苦手。即使对wasm有一定的了解，由于wasm的汇编语言可读性十分差，逆向起来会非常的痛苦。本文以刚刚结束的defconquals中的一道题和其他一些题为例，介绍一种wasm的优化分析方法，初步探究wasm逆向。</p><span id="more"></span> <ins class="adsbygoogle" style="display:block;text-align:center" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9312750344484857" data-ad-slot="6242382053"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><h2 id="wasm汇编简介"><a href="#wasm汇编简介" class="headerlink" title="wasm汇编简介"></a>wasm汇编简介</h2><p>wasm是基于堆栈的虚拟机的二进制指令格式。与x86架构的汇编又很大的区别。反倒更加类似python的opcode</p><p>下面分别是C++，wat，以及由用g++编译的x86 assembly代码，让我们首先对wasm汇编有个初步印象。</p><p>在<a target="_blank" rel="noopener external nofollow noreferrer" href="https://mbebenita.github.io/WasmExplorer/">WebAssembly Explorer</a>可以在线编译wasm</p><p>C++代码：</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">int testFunction(int* input, int length) &#123;
+  int sum &#x3D; 0;
+  for (int i &#x3D; 0; i &lt; length; ++i) &#123;
+    sum +&#x3D; input[i];
+  &#125;
+  return sum;
+&#125;</code></pre><p>wat代码：</p><pre class="line-numbers language-lisp" data-language="lisp"><code class="language-lisp">(module
+ (table 0 anyfunc)
+ (memory $0 1)
+ (export &quot;memory&quot; (memory $0))
+ (export &quot;_Z12testFunctionPii&quot; (func $_Z12testFunctionPii))
+ (func $_Z12testFunctionPii (; 0 ;) (param $0 i32) (param $1 i32) (result i32)
+  (local $2 i32)
+  (set_local $2
+   (i32.const 0)
+  )
+  (block $label$0
+   (br_if $label$0
+    (i32.lt_s
+     (get_local $1)
+     (i32.const 1)
+    )
+   )
+   (loop $label$1
+    (set_local $2
+     (i32.add
+      (i32.load
+       (get_local $0)
+      )
+      (get_local $2)
+     )
+    )
+    (set_local $0
+     (i32.add
+      (get_local $0)
+      (i32.const 4)
+     )
+    )
+    (br_if $label$1
+     (tee_local $1
+      (i32.add
+       (get_local $1)
+       (i32.const -1)
+      )
+     )
+    )
+   )
+  )
+  (get_local $2)
+ )
+)</code></pre><p>使用gcc编译的x86汇编：</p><pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">   push    rbp
+   mov     rbp, rsp
+   mov     [rbp-18h], rdi
+   mov     [rbp-1Ch], esi
+   mov     dword ptr [rbp-8], 0
+   mov     dword ptr [rbp-4], 0
+   mov     eax, [rbp-4]
+   cmp     eax, [rbp-1Ch]
+   jge     short loc_400766
+   mov     eax, [rbp-4]
+   cdqe
+   lea     rdx, ds:0[rax*4]
+   mov     rax, [rbp-18h]
+   add     rax, rdx
+   mov     eax, [rax]
+   add     [rbp-8], eax
+   add     dword ptr [rbp-4], 1
+   jmp     short loc_01
+loc_01:
+   mov     eax, [rbp-8]
+   pop     rbp
+   retn</code></pre><p>可以看到，不同于x86使用的寄存器加栈的架构，wasm主要基于栈。局部变量被保存在local内，全局变量保存在global中，对变量的操作则使用get_local入栈，操作完再使用set_local设置局部变量。</p><p>接下来我们以DEF CON CTF 2019 Quals中的wasm为例，讲解一种wasm的逆向分析方法</p><p>拿到网址后f12把wasm下载下来，得到wasm.wasm</p><ins class="adsbygoogle" style="display:block;text-align:center" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9312750344484857" data-ad-slot="1531897039"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><h2 id="反汇编"><a href="#反汇编" class="headerlink" title="反汇编"></a>反汇编</h2><p>就像x86汇编，wat的每一句机器码都能唯一的对应一句wasm汇编语句。</p><p>幸运的是，ida自带webassembly的处理器模块。wasm文件可以直接被反汇编。</p><p>或是使用<a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/WebAssembly/wabt">wasm2wat</a>，将生成一份文本格式的.wat文件。</p><pre class="line-numbers language-sh" data-language="sh"><code class="language-sh">.&#x2F;wasm2wat wasm.wasm -o wasm.wat</code></pre><p>然而没有人愿意对着”低级”的汇编代码分析，我们更情愿看”高级”一点的语言。</p><p>有关wat文本格式的文章：<a target="_blank" rel="noopener external nofollow noreferrer" href="https://wasm.comptechs.cn/tutorial/Understanding_the_text_format.html">理解WebAssembly文本格式</a></p><h2 id="反编译"><a href="#反编译" class="headerlink" title="反编译"></a>反编译</h2><p>ida当然没有反编译模块。（事实上，正常情况下ida只支持x86和arm架构的反编译）</p><p>好在，我们可以用<a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/WebAssembly/wabt/tree/master/wasm2c">wasm2c</a>来生反编译</p><p><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/WebAssembly/wabt">这里</a>是wabt的项目仓库，可以基本实现wasm，wat，c之间的相互转换</p><p>编译好后，用如下指令得到c代码：</p><pre class="line-numbers language-sh" data-language="sh"><code class="language-sh">.&#x2F;wasm2c wasm.wasm -o wasm.c</code></pre><p>得到wasm.c和wasm.h</p><p>然而此工具得到的c代码并不尽如人意，光是行数已经很吓人了，这道nodb反编译出来的c文件由12000+行！</p><p>而且代码几乎和wat内容没啥区别</p><p>随便截取其中的几行，似乎只是把局部变量与全局变量换了个名字，省略了出入栈的操作。</p><pre class="line-numbers language-c" data-language="c"><code class="language-c">&#x2F;&#x2F;...
+  u32 i0, i1, i2;
+  i0 &#x3D; g12;
+  l64 &#x3D; i0;
+  i0 &#x3D; p1;
+  l45 &#x3D; i0;
+  i0 &#x3D; p0;
+  l55 &#x3D; i0;
+  i0 &#x3D; l45;
+  i1 &#x3D; l55;
+  i0 ^&#x3D; i1;
+  l56 &#x3D; i0;
+  i0 &#x3D; l56;
+  i1 &#x3D; 3u;
+  i0 &amp;&#x3D; i1;
+  l57 &#x3D; i0;
+  i0 &#x3D; l57;
+  i1 &#x3D; 0u;
+
+&#x2F;&#x2F;...</code></pre><h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><p>这种代码显然是无法分析的，我们需要优化</p><p>这里提供一种比较简单的优化方式：用gcc编译后在用ida反编译</p><p>将之前反编译出来的wasm.c，wasm.h，以及wabt项目内的wasm-rt.h，wasm-rt-impl.c，wasm-rt-impl.h三个文件放到同一个文件夹。</p><p>直接gcc wasm.c会报错，因为很多wasm的函数没有具体的实现。但是我们可以只编译不链接，我们关心的只是程序本身的逻辑，不需要真正编译出能运行的elf来。</p><pre class="line-numbers language-sh" data-language="sh"><code class="language-sh">$ gcc -c wasm.c -o wasm.o</code></pre><p>得到的还未连接的elf文件wasm.o</p><p>现在可以丢进ida来分析了，比之前的wasm.c友好很多。</p><p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190515140326-279ec3e2-76d7-1.jpeg"></p><p>尽管和原始的代码差别较大，但好歹可以开始分析了。</p><ins class="adsbygoogle" style="display:block;text-align:center" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9312750344484857" data-ad-slot="4343471862"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><p>搜索字符串是每个逆向手接触一个程序的第一步</p><p>对于wasm，所有的字符串会被存放在二进制文件的末尾，以此能获取一些关键的信息。</p><p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190515140442-54a20750-76d7-1.jpg"></p><p>同时也能在wasm.c中看到这些字符串的定义</p><p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190515140533-7312312e-76d7-1.png"></p><p>直接对字符串查找引用是找不到引用的，因为并不是直接对地址的引用，想找到这些字符串会困难一些。</p><p>然而开头的常量比较可疑，比赛的flag格式是OOO{}，这里开头又有连续三个一样的字节，让人联想到异或或者只是一个偏移。抱着试试看的态度减了一下，直接出了flag。。。</p><p>除了这种偷鸡的做法，细心看看代码也能看出一点端倪。</p><p>在f24函数中，似乎从0x400开始的地方获取了个字节，然后返回了这个字节减66，刚好是跟flag的差距。</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">if ( g12 &gt;&#x3D; g13 )
+    Z_envZ_abortStackOverflowZ_vi(80LL);
+  v1 &#x3D; i64_load(Z_envZ_memory, 0x400LL);
+  i64_store(Z_envZ_memory, v13, v1);
+  v2 &#x3D; i64_load(Z_envZ_memory, 0x408LL);
+  i64_store(Z_envZ_memory, v13 + 8, v2);
+  v3 &#x3D; i64_load(Z_envZ_memory, 0x410LL);
+  i64_store(Z_envZ_memory, v13 + 16, v3);
+  v4 &#x3D; i64_load(Z_envZ_memory, 0x418LL);
+  i64_store(Z_envZ_memory, v13 + 24, v4);
+  v5 &#x3D; i64_load(Z_envZ_memory, 0x420LL);
+  i64_store(Z_envZ_memory, v13 + 32, v5);
+  v6 &#x3D; i64_load(Z_envZ_memory, 0x428LL);
+  i64_store(Z_envZ_memory, v13 + 40, v6);
+  v7 &#x3D; i64_load(Z_envZ_memory, 0x430LL);
+  i64_store(Z_envZ_memory, v13 + 48, v7);
+  v8 &#x3D; i64_load(Z_envZ_memory, 0x438LL);
+  i64_store(Z_envZ_memory, v13 + 56, v8);
+  v9 &#x3D; i32_load(Z_envZ_memory, 0x440LL);
+  i32_store(Z_envZ_memory, v13 + 64, v9);
+  v10 &#x3D; i32_load8_s(Z_envZ_memory, 0x444LL);
+  i32_store8(Z_envZ_memory, v13 + 68, v10);
+  v11 &#x3D; i32_load8_s(Z_envZ_memory, a1 + v13);
+  g12 &#x3D; v13;
+  --wasm_rt_call_stack_depth;
+  return (unsigned __int8)(v11 - 66);</code></pre><p>主逻辑在_authenticate，其中有两处比较可疑:</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">v1 &#x3D; i32_load(Z_envZ_memory, 0x4D0LL);
+i32_store(Z_envZ_memory, (unsigned int)(v18 + 28), v1);
+v2 &#x3D; i32_load8_s(Z_envZ_memory, 0x4D4LL);</code></pre><p>还有循环结尾的：</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">if ( v11 &#x3D;&#x3D; 69 )
+    &#123;
+      g12 &#x3D; v18;
+      v13 &#x3D; 0x4D5;
+    &#125;
+else
+    &#123;
+      g12 &#x3D; v18;
+      v13 &#x3D; 0x4DD;</code></pre><p>如果0x400指向常量的开头，0x4d5刚好对应success，0x4DD刚好对应failure。这肯定不是巧合。事实上，0x400的偏移都对应常量开头，在之前做的另外一些题中也能看到类似的结构。</p><p>如此一来，我们便能轻易的从密文中猜出flag</p><h2 id="另外两个例子"><a href="#另外两个例子" class="headerlink" title="另外两个例子"></a>另外两个例子</h2><h3 id="simple-wasm"><a href="#simple-wasm" class="headerlink" title="simple wasm"></a>simple wasm</h3><p>这是去年上交大运维赛的一道web题，能得到一个wasm。</p><p>直接在文件为查找字符串：</p><p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190515140554-7fe1a970-76d7-1.jpg"></p><p>看到了base64表和密文，解码出来是</p><pre class="line-numbers language-sh" data-language="sh"><code class="language-sh">iodj~44h393d5fh4;e:9h6i598f798;gd&lt;4hf€</code></pre><p>看看check函数，有个地方可疑：</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">while ( v14 !&#x3D; 38 )
+  &#123;
+    v4 &#x3D; v14++;
+    v5 &#x3D; i32_load8_s(Z_envZ_memory, v4 + a1);
+    f797(v21, (unsigned __int8)(v5 + 3));
+  &#125;</code></pre><p>38就是长度，下面有个+3，也就是凯撒密码。</p><p>减一下就能得到flag</p><pre class="line-numbers language-lua" data-language="lua"><code class="language-lua">flag&#123;11e060a2ce18b76e3f265c4658da91ec&#125;</code></pre><ins class="adsbygoogle" style="display:block;text-align:center" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9312750344484857" data-ad-slot="1364765716"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><h3 id="where-u-are"><a href="#where-u-are" class="headerlink" title="where_u_are"></a>where_u_are</h3><p>这是前阵子国赛初赛中的一道wasm题。</p><p><img src="https://xzfile.aliyuncs.com/media/upload/picture/20190515140616-8cdb1be8-76d7-1.jpg"></p><p>先找字符串，确定main函数位置</p><p>注意f23中几个函数调用的参数：</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">for ( i &#x3D; 0; i &lt; 1; i++ )
+  &#123;
+    i32_store(Z_envZ_memory, (unsigned int)v11, v9);
+    f99(0x1170u, (char *)(unsigned int)v11, (unsigned int)v11);
+    v4 &#x3D; f23(v9, (char *)(unsigned int)v11, v3);
+    v7 &#x3D; f24((int *)v4, (unsigned int)v11, v5);
+    f64_load(Z_envZ_memory, v7 + 8);
+    f64_load(Z_envZ_memory, v7);
+    f64_store(Z_envZ_memory, v10);
+    f64_store(Z_envZ_memory, (unsigned int)((_DWORD)v11 + 16));
+    f98(0x1173u, v10, v10);
+  &#125;
+  f64_load(Z_envZ_memory, v7);
+  if ( 0.0 - (double)25 &gt;&#x3D; 1.0 || (f64_load(Z_envZ_memory, v7 + 8), 1.0 - (double)175 &gt;&#x3D; 1.0) )
+  &#123;
+    f98(0x1186u, (unsigned int)((_DWORD)v11 + 32), (unsigned int)((_DWORD)v11 + 32));
+    g10 &#x3D; (signed int)v11;
+  &#125;
+  else
+  &#123;
+    f98(0x117Cu, (unsigned int)((_DWORD)v11 + 24), (unsigned int)((_DWORD)v11 + 24));
+    g10 &#x3D; (signed int)v11;
+  &#125;</code></pre><p>注意f99, f98的参数：0x1170, 0x1173, 0x1168, 0x117C</p><p>刚好对应之前的字符串常量之间的偏移，可以断定这是scanf和printf</p><p>f23中对输入进行了一些操作：</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">for ( i &#x3D; 0; i &lt; (unsigned int)strlen(a1, (__int64)a2, v3); ++i )
+  &#123;
+    for ( j &#x3D; 4; ; --j )
+    &#123;
+      v3 &#x3D; (unsigned int)j;
+      if ( j &gt;&#x3D; 0 &#x3D;&#x3D; 0 )
+        break;
+      ++v11;
+      v4 &#x3D; i + a1;
+      v5 &#x3D; i32_load8_s(Z_envZ_memory, v4);
+      v7 &#x3D; f22(v5, v4, v6);
+      a2 &#x3D; (char *)(unsigned int)(4 * (v11 - 1) + 0x11E0);
+      i32_store(Z_envZ_memory, (__int64)a2, (v7 &gt;&gt; (j % 5 &amp; 0x1F)) &amp; 1);
+    &#125;
+  &#125;</code></pre><p>再看看f22</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">for ( i &#x3D; 0; ; ++i )
+  &#123;
+    if ( i &gt;&#x3D; 32 )
+    &#123;
+      v6 &#x3D; 6;
+      goto LABEL_11;
+    &#125;
+    v4 &#x3D; i;
+    if ( a1 &#x3D;&#x3D; (char)i32_load8_s(Z_envZ_memory, (unsigned int)(i + 0x400)) )
+      break;
+  &#125;</code></pre><p>似乎是从0x400的偏移找某个值，而且范围是32？</p><p>找找0x400的偏移（跟之前一样，0x400也是字符串常量的开头？）</p><p>在数据开头，看到了一个长度为32的表</p><pre class="line-numbers language-none"><code class="language-none">.rodata:000000000006BF00 data_segment_data_0 db &#39;0123456789bcdefghjkmnpqrstuvwxyz&#39;
+.rodata:000000000006BF00                                         ; DATA XREF: init_memory+14↑o
+.rodata:000000000006BF20                 db    2</code></pre><p>联想一下之前的查表，这应该是我们的输入范围。</p><p>回到f23，看到循环内有右移j%5再&amp;1得操作，可能是分离每一位</p><p>加密逻辑在f24内：</p><pre class="line-numbers language-cpp" data-language="cpp"><code class="language-cpp">v11 &#x3D; -180.0;
+v12 &#x3D; 180.0;
+v13 &#x3D; -90.0;
+v14 &#x3D; 90.0;
+for ( i &#x3D; 0; i &lt; 50; ++i )
+&#123;
+  v6 &#x3D; i32_load(Z_envZ_memory, (unsigned int)(4 * i + (_DWORD)a1));
+  if ( (i + 1) % 2 &#x3D;&#x3D; 1 )
+    i32_store(Z_envZ_memory, (unsigned int)(4 * ((i + 1) &#x2F; 2) + v7), v6);
+  else
+    i32_store(Z_envZ_memory, (unsigned int)(4 * (i &#x2F; 2) + v8), v6);
+&#125;
+for ( j &#x3D; 0; j &lt; 20; ++j )
+&#123;
+  if ( (unsigned int)i32_load(Z_envZ_memory, (unsigned int)(4 * j + v7)) &#x3D;&#x3D; 1 )
+  &#123;
+    v11 &#x3D; v10;
+    v10 &#x3D; (v10 + v12) &#x2F; 2.0;
+  &#125;
+  else if ( (unsigned int)i32_load(Z_envZ_memory, (unsigned int)(4 * j + v7)) &#x3D;&#x3D; 0 )
+  &#123;
+    v12 &#x3D; v10;
+    v10 &#x3D; (v11 + v10) &#x2F; 2.0;
+  &#125;
+  if ( (unsigned int)i32_load(Z_envZ_memory, (unsigned int)(4 * j + v8)) &#x3D;&#x3D; 1 )
+  &#123;
+    v13 &#x3D; v9;
+    v9 &#x3D; (v9 + v14) &#x2F; 2.0;
+  &#125;
+  else if ( (unsigned int)i32_load(Z_envZ_memory, (unsigned int)(4 * j + v8)) &#x3D;&#x3D; 0 )
+  &#123;
+    v14 &#x3D; v9;
+    v9 &#x3D; (v13 + v9) &#x2F; 2.0;
+  &#125;
+&#125;</code></pre><p>是不是很像二分查找？</p><p>猜测下逻辑，把输入按32个字符的table映射到一个0-31的数字，转二进制后，根据奇数位和偶数位分成两组，根据每一位为1或0决定二分查找的方向，两组分别在[-180,180]和[-90,90]区间内二分查找，找到结果为175和25时结果正确，注意精度要足够。</p><ins class="adsbygoogle" style="display:block;text-align:center" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-9312750344484857" data-ad-slot="9735399345"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>初步分析了wasm静态分析的方法。wasm作为一种新的指令格式，相关工具并不齐全。总体上还有很大的进步空间。</p><p>关于wasm的动态调试过程在网上可以查到很多教程，这里就不多做分析了。用chrome，Firefox等浏览器可以轻松实现wasm的动态调试。在动态调试的过程中能验证静态分析的一些猜想。</p></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2019/11/6536.html" class="pre-post btn btn-default" title="一步步学习Webassembly逆向分析方法"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">一步步学习Webassembly逆向分析方法</span> </a><a href="/blog/2019/11/27706.html" class="next-post btn btn-default" title="用idawasm IDA Pro逆向WebAssembly模块"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">用idawasm IDA Pro逆向WebAssembly模块</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

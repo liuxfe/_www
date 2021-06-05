@@ -1,0 +1,313 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="Java"><meta name="description" content="新特性列表以下是Java8中的引入的部分新特性。关于Java8新特性更详细的介绍可参考这里。
+
+接口默认方法和静态方法
+Lambda 表达式
+函数式接口
+方法引用
+Stream
+Optional..."><title>Java8新特性及使用(一) | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="Java8新特性及使用(一)">Java8新特性及使用(一)</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/%E5%90%8E%E7%AB%AF/">后端</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/Java/" rel="tag">Java</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/11/13</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 934</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="新特性列表"><a href="#新特性列表" class="headerlink" title="新特性列表"></a>新特性列表</h2><p>以下是Java8中的引入的部分新特性。关于Java8新特性更详细的介绍可参考<a target="_blank" rel="noopener external nofollow noreferrer" href="http://www.oracle.com/technetwork/java/javase/8-whats-new-2157071.html">这里</a>。</p><ul><li>接口默认方法和静态方法</li><li>Lambda 表达式</li><li>函数式接口</li><li>方法引用</li><li>Stream</li><li>Optional</li><li>Date/Time API</li><li>重复注解</li><li>扩展注解的支持</li><li>Base64</li><li>JavaFX</li><li>其它<ul><li>JDBC4.2规范</li><li>更好的类型推测机制</li><li>HashMap性能提升</li><li>IO/NIO 的改进</li><li>JavaScript引擎Nashorn</li><li>并发（Concurrency）</li><li>类依赖分析器jdeps</li><li>JVM的PermGen空间被移除</li></ul></li></ul><h2 id="一、接口默认方法和静态方法"><a href="#一、接口默认方法和静态方法" class="headerlink" title="一、接口默认方法和静态方法"></a>一、接口默认方法和静态方法</h2><p>Java 8用默认方法与静态方法这两个新概念来扩展接口的声明。与传统的接口又有些不一样，它允许在已有的接口中添加新方法，而同时又保持了与旧版本代码的兼容性。</p><h3 id="1-接口默认方法"><a href="#1-接口默认方法" class="headerlink" title="1. 接口默认方法"></a>1. 接口默认方法</h3><p>默认方法与抽象方法不同之处在于抽象方法必须要求实现，但是默认方法则没有这个要求。相反，每个接口都必须提供一个所谓的默认实现，这样所有的接口实现者将会默认继承它（如果有必要的话，可以覆盖这个默认实现）。让我们看看下面的例子：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">private interface Defaulable &#123;
+    &#x2F;&#x2F; Interfaces now allow default methods, the implementer may or
+    &#x2F;&#x2F; may not implement (override) them.
+    default String notRequired() &#123;
+        return &quot;Default implementation&quot;;
+    &#125;
+&#125;
+
+private static class DefaultableImpl implements Defaulable &#123;
+&#125;
+
+private static class OverridableImpl implements Defaulable &#123;
+    @Override
+    public String notRequired() &#123;
+        return &quot;Overridden implementation&quot;;
+    &#125;
+&#125;</code></pre><p><code>Defaulable</code>接口用关键字<code>default</code>声明了一个默认方法<code>notRequired()</code>，<code>Defaulable</code>接口的实现者之一<code>DefaultableImpl</code>实现了这个接口，并且让默认方法保持原样。<code>Defaulable</code>接口的另一个实现者<code>OverridableImpl</code>用自己的方法覆盖了默认方法。</p><h4 id="1-多重继承的冲突说明"><a href="#1-多重继承的冲突说明" class="headerlink" title="(1). 多重继承的冲突说明"></a>(1). 多重继承的冲突说明</h4><p>由于同一个方法可以从不同的接口引入，自然而然的会有冲突的现象，规则如下：</p><ul><li>一个声明在类里面的方法优先于任何默认方法</li><li>优先选取最具体的实现</li></ul><pre class="line-numbers language-java" data-language="java"><code class="language-java">public interface A &#123;
+
+    default void hello() &#123;
+        System.out.println(&quot;Hello A&quot;);
+    &#125;
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">public interface B extends A &#123;
+
+    default void hello() &#123;
+        System.out.println(&quot;Hello B&quot;);
+    &#125;
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class C implements A, B &#123;
+
+    public static void main(String[] args) &#123;
+        new C().hello(); &#x2F;&#x2F; 输出 Hello B
+    &#125;
+
+&#125;</code></pre><h4 id="2-优缺点"><a href="#2-优缺点" class="headerlink" title="(2). 优缺点"></a>(2). 优缺点</h4><ul><li><strong>优点</strong>: 可以在不破坏代码的前提下扩展原有库的功能。它通过一个很优雅的方式使得接口变得更智能，同时还避免了代码冗余，并且扩展类库。</li><li><strong>缺点</strong>: 使得<strong>接口作为协议，类作为具体实现</strong>的界限开始变得有点模糊。</li></ul><h4 id="3-接口默认方法不能重载Object类的任何方法"><a href="#3-接口默认方法不能重载Object类的任何方法" class="headerlink" title="(3). 接口默认方法不能重载Object类的任何方法"></a>(3). 接口默认方法不能重载Object类的任何方法</h4><p><strong>接口不能提供对Object类的任何方法的默认实现</strong>。简单地讲，每一个java类都是Object的子类，也都继承了它类中的<code>equals()</code>/<code>hashCode()</code>/<code>toString()</code>方法，那么在类的接口上包含这些默认方法是没有意义的，它们也从来不会被编译。</p><p>在JVM中，默认方法的实现是非常高效的，并且通过字节码指令为方法调用提供了支持。默认方法允许继续使用现有的Java接口，而同时能够保障正常的编译过程。这方面好的例子是大量的方法被添加到<code>java.util.Collection</code>接口中去：<code>stream()</code>，<code>parallelStream()</code>，<code>forEach()</code>，<code>removeIf()</code>等。尽管默认方法非常强大，但是在使用默认方法时我们需要小心注意一个地方：在声明一个默认方法前，请仔细思考是不是真的有必要使用默认方法。</p><h3 id="2-接口静态方法"><a href="#2-接口静态方法" class="headerlink" title="2. 接口静态方法"></a>2. 接口静态方法</h3><p>Java 8带来的另一个有趣的特性是接口可以声明（并且可以提供实现）静态方法。在接口中定义静态方法，使用<code>static</code>关键字，例如：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public interface StaticInterface &#123;
+
+    static void method() &#123;
+        System.out.println(&quot;这是Java8接口中的静态方法!&quot;);
+    &#125;
+
+&#125;</code></pre><p>下面的一小段代码是上面静态方法的使用。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class Main &#123;
+
+    public static void main(String[] args) &#123;
+        StaticInterface.method(); &#x2F;&#x2F; 输出 这是Java8接口中的静态方法!
+    &#125;
+
+&#125;</code></pre><p>Java支持一个实现类可以实现多个接口，如果多个接口中存在同样的<code>static</code>方法会怎么样呢？如果有两个接口中的静态方法一模一样，并且一个实现类同时实现了这两个接口，此时并不会产生错误，因为Java8中只能通过接口类调用接口中的静态方法，所以对编译器来说是可以区分的。</p><p>二、Lambda 表达式</p><p><code>Lambda</code>表达式（也称为闭包）是整个Java 8发行版中最受期待的在Java语言层面上的改变，Lambda允许把函数作为一个方法的参数（即：<strong>行为参数化</strong>，函数作为参数传递进方法中）。</p><p>一个<code>Lambda</code>可以由用逗号分隔的参数列表、<code>–&gt;</code>符号与函数体三部分表示。</p><p>首先看看在老版本的Java中是如何排列字符串的：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">List&lt;String&gt; names &#x3D; Arrays.asList(&quot;peter&quot;, &quot;anna&quot;, &quot;mike&quot;, &quot;xenia&quot;);
+Collections.sort(names, new Comparator&lt;String&gt;() &#123;
+
+    @Override
+    public int compare(String a, String b) &#123;
+        return b.compareTo(a);
+    &#125;
+
+&#125;);</code></pre><p>只需要给静态方法<code>Collections.sort</code>传入一个List对象以及一个比较器来按指定顺序排列。通常做法都是创建一个匿名的比较器对象然后将其传递给sort方法。<br>在Java 8 中你就没必要使用这种传统的匿名对象的方式了，Java 8提供了更简洁的语法，lambda表达式：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Collections.sort(names, (String a, String b) -&gt; &#123;
+    return b.compareTo(a);
+&#125;);</code></pre><p>看到了吧，代码变得更段且更具有可读性，但是实际上还可以写得更短：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Collections.sort(names, (String a, String b) -&gt; b.compareTo(a));</code></pre><p>对于函数体只有一行代码的，你可以去掉大括号<code>&#123;&#125;</code>以及<code>return</code>关键字，但是你还可以写得更短点：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Collections.sort(names, (a, b) -&gt; b.compareTo(a));</code></pre><p>Java编译器可以自动推导出参数类型，所以你可以不用再写一次类型。</p><h2 id="三、函数式接口"><a href="#三、函数式接口" class="headerlink" title="三、函数式接口"></a>三、函数式接口</h2><p><code>Lambda</code>表达式是如何在Java的类型系统中表示的呢？每一个Lambda表达式都对应一个类型，通常是接口类型。而<strong>函数式接口</strong>是指仅仅只包含一个抽象方法的接口，每一个该类型的Lambda表达式都会被匹配到这个抽象方法。因为<strong>默认方法</strong>不算抽象方法，所以你也可以给你的函数式接口添加默认方法。</p><p>我们可以将Lambda表达式当作任意只包含一个抽象方法的接口类型，确保你的接口一定达到这个要求，你只需要给你的接口添加<code>@FunctionalInterface</code>注解，编译器如果发现你标注了这个注解的接口有多于一个抽象方法的时候会报错的。</p><p>示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+interface Converter&lt;F, T&gt; &#123;
+    T convert(F from);
+&#125;
+
+Converter&lt;String, Integer&gt; converter &#x3D; (from) -&gt; Integer.valueOf(from);
+Integer converted &#x3D; converter.convert(&quot;123&quot;);
+System.out.println(converted); &#x2F;&#x2F; 123</code></pre><blockquote><p><strong>注</strong>：如果<code>@FunctionalInterface</code>如果没有指定，上面的代码也是对的。</p></blockquote><p>Java8 API包含了很多内建的函数式接口，在老Java中常用到的比如<code>Comparator</code>或者<code>Runnable</code>接口，这些接口都增加了<code>@FunctionalInterface</code>注解以便能用在<code>Lambda</code>上。</p><p>Java8 API同样还提供了很多全新的函数式接口来让工作更加方便，有一些接口是来自Google Guava库里的，即便你对这些很熟悉了，还是有必要看看这些是如何扩展到lambda上使用的。</p><h3 id="1-Comparator-比较器接口"><a href="#1-Comparator-比较器接口" class="headerlink" title="1. Comparator (比较器接口)"></a>1. Comparator (比较器接口)</h3><p><code>Comparator</code>是老Java中的经典接口， Java 8在此之上添加了多种默认方法。源代码及使用示例如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+public interface Comparator&lt;T&gt; &#123;
+
+    int compare(T o1, T o2);
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">Comparator&lt;Person&gt; comparator &#x3D; (p1, p2) -&gt; p1.firstName.compareTo(p2.firstName);
+Person p1 &#x3D; new Person(&quot;John&quot;, &quot;Doe&quot;);
+Person p2 &#x3D; new Person(&quot;Alice&quot;, &quot;Wonderland&quot;);
+comparator.compare(p1, p2);             &#x2F;&#x2F; &gt; 0
+comparator.reversed().compare(p1, p2);  &#x2F;&#x2F; &lt; 0</code></pre><h3 id="2-Consumer-消费型接口"><a href="#2-Consumer-消费型接口" class="headerlink" title="2. Consumer (消费型接口)"></a>2. Consumer (消费型接口)</h3><p><code>Consumer</code>接口表示执行在单个参数上的操作。源代码及使用示例如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+public interface Consumer&lt;T&gt; &#123;
+
+    void accept(T t);
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">Consumer&lt;Person&gt; greeter &#x3D; (p) -&gt; System.out.println(&quot;Hello, &quot; + p.firstName);
+greeter.accept(new Person(&quot;Luke&quot;, &quot;Skywalker&quot;));</code></pre><h4 id="更多的Consumer接口"><a href="#更多的Consumer接口" class="headerlink" title="更多的Consumer接口"></a>更多的Consumer接口</h4><ul><li><code>BiConsumer：void accept(T t, U u);</code>: 接受两个参数的二元函数</li><li><code>DoubleConsumer：void accept(double value);</code>: 接受一个double参数的一元函数</li><li><code>IntConsumer：void accept(int value);</code>: 接受一个int参数的一元函数</li><li><code>LongConsumer：void accept(long value);</code>: 接受一个long参数的一元函数</li><li><code>ObjDoubleConsumer：void accept(T t, double value);</code>: 接受一个泛型参数一个double参数的二元函数</li><li><code>ObjIntConsumer：void accept(T t, int value);</code>: 接受一个泛型参数一个int参数的二元函数</li><li><code>ObjLongConsumer：void accept(T t, long value);</code>: 接受一个泛型参数一个long参数的二元函数</li></ul><h3 id="3-Supplier-供应型接口"><a href="#3-Supplier-供应型接口" class="headerlink" title="3. Supplier (供应型接口)"></a>3. Supplier (供应型接口)</h3><p><code>Supplier</code>接口是不需要参数并返回一个任意范型的值。其简洁的声明，会让人以为不是函数。这个抽象方法的声明，同Consumer相反，是一个只声明了返回值，不需要参数的函数。也就是说Supplier其实表达的不是从一个参数空间到结果空间的映射能力，而是表达一种生成能力，因为我们常见的场景中不止是要consume（Consumer）或者是简单的map（Function），还包括了new这个动作。而Supplier就表达了这种能力。源代码及使用示例如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+public interface Supplier&lt;T&gt; &#123;
+
+    T get();
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">Supplier&lt;Person&gt; personSupplier &#x3D; Person::new;
+personSupplier.get();   &#x2F;&#x2F; new Person</code></pre><h4 id="更多Supplier接口"><a href="#更多Supplier接口" class="headerlink" title="更多Supplier接口"></a>更多Supplier接口</h4><ul><li><code>BooleanSupplier：boolean getAsBoolean();</code>: 返回boolean的无参函数</li><li><code>DoubleSupplier：double getAsDouble();</code>: 返回double的无参函数</li><li><code>IntSupplier：int getAsInt();</code>: 返回int的无参函数</li><li><code>LongSupplier：long getAsLong();</code>: 返回long的无参函数</li></ul><h3 id="4-Predicate-断言型接口"><a href="#4-Predicate-断言型接口" class="headerlink" title="4. Predicate (断言型接口)"></a>4. Predicate (断言型接口)</h3><p><code>Predicate</code>接口只有一个参数，返回<code>boolean</code>类型。该接口包含多种默认方法来将<code>Predicate</code>组合成其他复杂的逻辑（比如：<strong>与</strong>，<strong>或</strong>，<strong>非</strong>）。<code>Stream</code>的<code>filter</code>方法就是接受<code>Predicate</code>作为入参的。这个具体在后面使用<code>Stream</code>的时候再分析深入。源代码及使用示例如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+public interface Predicate&lt;T&gt; &#123;
+
+    boolean test(T t);
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">Predicate&lt;String&gt; predicate &#x3D; (s) -&gt; s.length() &gt; 0;
+predicate.test(&quot;foo&quot;);            &#x2F;&#x2F; true
+predicate.negate().test(&quot;foo&quot;);     &#x2F;&#x2F; false
+Predicate&lt;Boolean&gt; nonNull &#x3D; Objects::nonNull;
+Predicate&lt;Boolean&gt; isNull &#x3D; Objects::isNull;
+Predicate&lt;String&gt; isEmpty &#x3D; String::isEmpty;
+Predicate&lt;String&gt; isNotEmpty &#x3D; isEmpty.negate();</code></pre><h4 id="更多的Predicate接口"><a href="#更多的Predicate接口" class="headerlink" title="更多的Predicate接口"></a>更多的Predicate接口</h4><ul><li><code>BiPredicate：boolean test(T t, U u);</code>: 接受两个参数的二元断言函数</li><li><code>DoublePredicate：boolean test(double value);</code>: 入参为double的断言函数</li><li><code>IntPredicate：boolean test(int value);</code>: 入参为int的断言函数</li><li><code>LongPredicate：boolean test(long value);</code>: 入参为long的断言函数</li></ul><h3 id="5-Function-功能型接口"><a href="#5-Function-功能型接口" class="headerlink" title="5. Function (功能型接口)"></a>5. Function (功能型接口)</h3><p><code>Function</code>接口有一个参数并且返回一个结果，并附带了一些可以和其他函数组合的默认方法（<code>compose</code>, <code>andThen</code>）。源代码及使用示例如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+public interface Function&lt;T, R&gt; &#123;
+
+    R apply(T t);
+
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">Function&lt;String, Integer&gt; toInteger &#x3D; Integer::valueOf;
+Function&lt;String, String&gt; backToString &#x3D; toInteger.andThen(String::valueOf);
+backToString.apply(&quot;123&quot;);     &#x2F;&#x2F; &quot;123&quot;</code></pre><h4 id="更多的Function接口"><a href="#更多的Function接口" class="headerlink" title="更多的Function接口"></a>更多的Function接口</h4><ul><li><code>BiFunction ：R apply(T t, U u);</code>: 接受两个参数，返回一个值，代表一个二元函数；</li><li><code>DoubleFunction ：R apply(double value);</code>: 只处理double类型的一元函数；</li><li><code>IntFunction ：R apply(int value);</code>: 只处理int参数的一元函数；</li><li><code>LongFunction ：R apply(long value);</code>: 只处理long参数的一元函数；</li><li><code>ToDoubleFunction：double applyAsDouble(T value);</code>: 返回double的一元函数；</li><li><code>ToDoubleBiFunction：double applyAsDouble(T t, U u);</code>: 返回double的二元函数；</li><li><code>ToIntFunction：int applyAsInt(T value);</code>: 返回int的一元函数；</li><li><code>ToIntBiFunction：int applyAsInt(T t, U u);</code>: 返回int的二元函数；</li><li><code>ToLongFunction：long applyAsLong(T value);</code>: 返回long的一元函数；</li><li><code>ToLongBiFunction：long applyAsLong(T t, U u);</code>: 返回long的二元函数；</li><li><code>DoubleToIntFunction：int applyAsInt(double value);</code>: 接受double返回int的一元函数；</li><li><code>DoubleToLongFunction：long applyAsLong(double value);</code>: 接受double返回long的一元函数；</li><li><code>IntToDoubleFunction：double applyAsDouble(int value);</code>: 接受int返回double的一元函数；</li><li><code>IntToLongFunction：long applyAsLong(int value);</code>: 接受int返回long的一元函数；</li><li><code>LongToDoubleFunction：double applyAsDouble(long value);</code>: 接受long返回double的一元函数；</li><li><code>LongToIntFunction：int applyAsInt(long value);</code>: 接受long返回int的一元函数；</li></ul><h3 id="6-Operator"><a href="#6-Operator" class="headerlink" title="6. Operator"></a>6. Operator</h3><p><code>Operator</code>其实就是<code>Function</code>，函数有时候也叫作算子。算子在Java8中接口描述更像是函数的补充，和上面的很多类型映射型函数类似。算子Operator包括：<code>UnaryOperator</code>和<code>BinaryOperator</code>。分别对应单（一）元算子和二元算子。</p><p>算子的接口声明如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+public interface UnaryOperator&lt;T&gt; extends Function&lt;T, T&gt; &#123;
+
+    static &lt;T&gt; UnaryOperator&lt;T&gt; identity() &#123;
+        return t -&gt; t;
+    &#125;
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">@FunctionalInterface
+public interface BinaryOperator&lt;T&gt; extends BiFunction&lt;T,T,T&gt; &#123;
+
+    public static &lt;T&gt; BinaryOperator&lt;T&gt; minBy(Comparator&lt;? super T&gt; comparator) &#123;
+        Objects.requireNonNull(comparator);
+        return (a, b) -&gt; comparator.compare(a, b) &lt;&#x3D; 0 ? a : b;
+    &#125;
+
+    public static &lt;T&gt; BinaryOperator&lt;T&gt; maxBy(Comparator&lt;? super T&gt; comparator) &#123;
+        Objects.requireNonNull(comparator);
+        return (a, b) -&gt; comparator.compare(a, b) &gt;&#x3D; 0 ? a : b;
+    &#125;
+&#125;</code></pre><p><code>Operator</code>只需声明一个泛型参数T即可。对应的使用示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">UnaryOperator&lt;Integer&gt; increment &#x3D; x -&gt; x + 1;
+System.out.println(&quot;递增:&quot; + increment.apply(2)); &#x2F;&#x2F; 输出 递增:3
+
+BinaryOperator&lt;Integer&gt; add &#x3D; (x, y) -&gt; x + y;
+System.out.println(&quot;相加:&quot; + add.apply(2, 3)); &#x2F;&#x2F; 输出 相加:5
+
+BinaryOperator&lt;Integer&gt; min &#x3D; BinaryOperator.minBy((o1, o2) -&gt; o1 - o2);
+System.out.println(&quot;最小值:&quot; + min.apply(2, 3)); &#x2F;&#x2F; 输出 最小值:2</code></pre><h4 id="更多的Operator接口"><a href="#更多的Operator接口" class="headerlink" title="更多的Operator接口"></a>更多的Operator接口</h4><ul><li><code>LongUnaryOperator：long applyAsLong(long operand);</code>: 对long类型做操作的一元算子</li><li><code>IntUnaryOperator：int applyAsInt(int operand);</code>: 对int类型做操作的一元算子</li><li><code>DoubleUnaryOperator：double applyAsDouble(double operand);</code>: 对double类型做操作的一元算子</li><li><code>DoubleBinaryOperator：double applyAsDouble(double left, double right);</code>: 对double类型做操作的二元算子</li><li><code>IntBinaryOperator：int applyAsInt(int left, int right);</code>: 对int类型做操作的二元算子</li><li><code>LongBinaryOperator：long applyAsLong(long left, long right);</code>: 对long类型做操作的二元算子</li></ul><h3 id="6-其它函数式接口"><a href="#6-其它函数式接口" class="headerlink" title="6. 其它函数式接口"></a>6. 其它函数式接口</h3><ul><li>java.lang.Runnable</li><li>java.util.concurrent.Callable</li><li>java.security.PrivilegedAction</li><li>java.io.FileFilter</li><li>java.nio.file.PathMatcher</li><li>java.lang.reflect.InvocationHandler</li><li>java.beans.PropertyChangeListener</li><li>java.awt.event.ActionListener</li><li>javax.swing.event.ChangeListener</li></ul><h2 id="四、方法引用"><a href="#四、方法引用" class="headerlink" title="四、方法引用"></a>四、方法引用</h2><h3 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h3><p>在学习了Lambda表达式之后，我们通常使用Lambda表达式来创建匿名方法。然而，有时候我们仅仅是调用了一个已存在的方法。如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Arrays.sort(strArray, (s1, s2) -&gt; s1.compareToIgnoreCase(s2));</code></pre><p>在Java8中，我们可以直接通过方法引用来简写Lambda表达式中已经存在的方法。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Arrays.sort(strArray, String::compareToIgnoreCase);</code></pre><p>这种特性就叫做<strong>方法引用</strong>(<code>Method Reference</code>)。</p><p><strong>方法引用</strong>是用来直接访问类或者实例的已经存在的方法或者构造方法。方法引用提供了一种引用而不执行方法的方式，它需要由兼容的函数式接口构成的目标类型上下文。计算时，方法引用会创建函数式接口的一个实例。当Lambda表达式中只是执行一个方法调用时，不用Lambda表达式，直接通过方法引用的形式可读性更高一些。方法引用是一种更简洁易懂的Lambda表达式。</p><blockquote><p><strong>注意</strong>: 方法引用是一个Lambda表达式，其中方法引用的操作符是双冒号<code>::</code>。</p></blockquote><h3 id="2-分类"><a href="#2-分类" class="headerlink" title="2. 分类"></a>2. 分类</h3><p>方法引用的标准形式是：<code>类名::方法名</code>。（注意：只需要写方法名，不需要写括号）</p><p>有以下四种形式的方法引用：</p><ul><li>引用静态方法: ContainingClass::staticMethodName</li><li>引用某个对象的实例方法: containingObject::instanceMethodName</li><li>引用某个类型的任意对象的实例方法:ContainingType::methodName</li><li>引用构造方法: ClassName::new</li></ul><h3 id="3-示例"><a href="#3-示例" class="headerlink" title="3. 示例"></a>3. 示例</h3><p>使用示例如下：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class Person &#123;
+
+    String name;
+
+    LocalDate birthday;
+
+    public Person(String name, LocalDate birthday) &#123;
+        this.name &#x3D; name;
+        this.birthday &#x3D; birthday;
+    &#125;
+
+    public LocalDate getBirthday() &#123;
+        return birthday;
+    &#125;
+
+    public static int compareByAge(Person a, Person b) &#123;
+        return a.birthday.compareTo(b.birthday);
+    &#125;
+
+    @Override
+    public String toString() &#123;
+        return this.name;
+    &#125;
+&#125;</code></pre><pre class="line-numbers language-java" data-language="java"><code class="language-java">public class MethodReferenceTest &#123;
+
+    @Test
+    public static void main() &#123;
+        Person[] pArr &#x3D; new Person[] &#123;
+            new Person(&quot;003&quot;, LocalDate.of(2016,9,1)),
+            new Person(&quot;001&quot;, LocalDate.of(2016,2,1)),
+            new Person(&quot;002&quot;, LocalDate.of(2016,3,1)),
+            new Person(&quot;004&quot;, LocalDate.of(2016,12,1))
+        &#125;;
+
+        &#x2F;&#x2F; 使用匿名类
+        Arrays.sort(pArr, new Comparator&lt;Person&gt;() &#123;
+            @Override
+            public int compare(Person a, Person b) &#123;
+                return a.getBirthday().compareTo(b.getBirthday());
+            &#125;
+        &#125;);
+
+        &#x2F;&#x2F;使用lambda表达式
+        Arrays.sort(pArr, (Person a, Person b) -&gt; &#123;
+            return a.getBirthday().compareTo(b.getBirthday());
+        &#125;);
+
+        &#x2F;&#x2F;使用方法引用，引用的是类的静态方法
+        Arrays.sort(pArr, Person::compareByAge);
+    &#125;
+
+&#125;</code></pre><h2 id="五、Stream"><a href="#五、Stream" class="headerlink" title="五、Stream"></a>五、Stream</h2><p>Java8添加的<code>Stream API(java.util.stream)</code>把真正的函数式编程风格引入到Java中。这是目前为止对Java类库最好的补充，因为<code>Stream API</code>可以极大提供Java程序员的生产力，让程序员写出高效率、干净、简洁的代码。</p><p>流可以是无限的、有状态的，可以是顺序的，也可以是并行的。在使用流的时候，你首先需要从一些来源中获取一个流，执行一个或者多个中间操作，然后执行一个最终操作。中间操作包括<code>filter</code>、<code>map</code>、<code>flatMap</code>、<code>peel</code>、<code>distinct</code>、<code>sorted</code>、<code>limit</code>和<code>substream</code>。终止操作包括<code>forEach</code>、<code>toArray</code>、<code>reduce</code>、<code>collect</code>、<code>min</code>、<code>max</code>、<code>count</code>、<code>anyMatch</code>、<code>allMatch</code>、<code>noneMatch</code>、<code>findFirst</code>和<code>findAny</code>。 <code>java.util.stream.Collectors</code>是一个非常有用的实用类。该类实现了很多归约操作，例如将流转换成集合和聚合元素。</p><h3 id="1-一些重要方法说明"><a href="#1-一些重要方法说明" class="headerlink" title="1. 一些重要方法说明"></a>1. 一些重要方法说明</h3><ul><li><code>stream</code>: 返回数据流，集合作为其源</li><li><code>parallelStream</code>: 返回并行数据流， 集合作为其源</li><li><code>filter</code>: 方法用于过滤出满足条件的元素</li><li><code>map</code>: 方法用于映射每个元素对应的结果</li><li><code>forEach</code>: 方法遍历该流中的每个元素</li><li><code>limit</code>: 方法用于减少流的大小</li><li><code>sorted</code>: 方法用来对流中的元素进行排序</li><li><code>anyMatch</code>: 是否存在任意一个元素满足条件（返回布尔值）</li><li><code>allMatch</code>: 是否所有元素都满足条件（返回布尔值）</li><li><code>noneMatch</code>: 是否所有元素都不满足条件（返回布尔值）</li><li><code>collect</code>: 方法是终端操作，这是通常出现在管道传输操作结束标记流的结束</li></ul><h3 id="2-一些使用示例"><a href="#2-一些使用示例" class="headerlink" title="2. 一些使用示例"></a>2. 一些使用示例</h3><h4 id="1-Filter-过滤"><a href="#1-Filter-过滤" class="headerlink" title="(1). Filter 过滤"></a>(1). Filter 过滤</h4><pre class="line-numbers language-java" data-language="java"><code class="language-java">stringCollection
+    .stream()
+    .filter((s) -&gt; s.startsWith(&quot;a&quot;))
+    .forEach(System.out::println);</code></pre><h3 id="2-Sort-排序"><a href="#2-Sort-排序" class="headerlink" title="(2). Sort 排序"></a>(2). Sort 排序</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java">stringCollection
+    .stream()
+    .sorted()
+    .filter((s) -&gt; s.startsWith(&quot;a&quot;))
+    .forEach(System.out::println);</code></pre><h3 id="3-Map-映射"><a href="#3-Map-映射" class="headerlink" title="(3). Map 映射"></a>(3). Map 映射</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java">stringCollection
+    .stream()
+    .map(String::toUpperCase)
+    .sorted((a, b) -&gt; b.compareTo(a))
+    .forEach(System.out::println);</code></pre><h3 id="4-Match-匹配"><a href="#4-Match-匹配" class="headerlink" title="(4). Match 匹配"></a>(4). Match 匹配</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java">boolean anyStartsWithA &#x3D; stringCollection
+        .stream()
+        .anyMatch((s) -&gt; s.startsWith(&quot;a&quot;));
+System.out.println(anyStartsWithA);      &#x2F;&#x2F; true
+
+boolean allStartsWithA &#x3D; stringCollection
+        .stream()
+        .allMatch((s) -&gt; s.startsWith(&quot;a&quot;));
+System.out.println(allStartsWithA);      &#x2F;&#x2F; false
+
+boolean noneStartsWithZ &#x3D; stringCollection
+        .stream()
+        .noneMatch((s) -&gt; s.startsWith(&quot;z&quot;));
+System.out.println(noneStartsWithZ);      &#x2F;&#x2F; true</code></pre><h3 id="5-Count-计数"><a href="#5-Count-计数" class="headerlink" title="(5). Count 计数"></a>(5). Count 计数</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java">long startsWithB &#x3D; stringCollection
+        .stream()
+        .filter((s) -&gt; s.startsWith(&quot;b&quot;))
+        .count();
+System.out.println(startsWithB);    &#x2F;&#x2F; 3</code></pre><h3 id="6-Reduce-规约"><a href="#6-Reduce-规约" class="headerlink" title="(6). Reduce 规约"></a>(6). Reduce 规约</h3><p>这是一个最终操作，允许通过指定的函数来将<code>stream</code>中的多个元素规约为一个元素，规越后的结果是通过<code>Optional</code>接口表示的。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Optional&lt;String&gt; reduced &#x3D; stringCollection
+        .stream()
+        .sorted()
+        .reduce((s1, s2) -&gt; s1 + &quot;#&quot; + s2);
+reduced.ifPresent(System.out::println);</code></pre><h2 id="六、Optional"><a href="#六、Optional" class="headerlink" title="六、Optional"></a>六、Optional</h2><p>到目前为止，臭名昭著的空指针异常是导致Java应用程序失败的最常见原因。以前，为了解决空指针异常，Google公司著名的<code>Guava</code>项目引入了<code>Optional</code>类，Guava通过使用检查空值的方式来防止代码污染，它鼓励程序员写更干净的代码。受到Google Guava的启发，<code>Optional</code>类已经成为Java 8类库的一部分。</p><p><code>Optional</code>实际上是个容器：它可以保存类型T的值，或者仅仅保存null。<code>Optional</code>提供很多有用的方法，这样我们就不用显式进行空值检测。</p><p>我们下面用两个小例子来演示如何使用Optional类：一个允许为空值，一个不允许为空值。</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Optional&lt;String&gt; fullName &#x3D; Optional.ofNullable(null);
+System.out.println(&quot;Full Name is set? &quot; + fullName.isPresent());
+System.out.println(&quot;Full Name: &quot; + fullName.orElseGet(() -&gt; &quot;[none]&quot;));
+System.out.println(fullName.map(s -&gt; &quot;Hey &quot; + s + &quot;!&quot;).orElse(&quot;Hey Stranger!&quot;));</code></pre><p>如果<code>Optional</code>类的实例为非空值的话，<code>isPresent()</code>返回<code>true</code>，否从返回<code>false</code>。为了防止Optional为空值，<code>orElseGet()</code>方法通过回调函数来产生一个默认值。<code>map()</code>函数对当前<code>Optional</code>的值进行转化，然后返回一个新的<code>Optional</code>实例。<code>orElse()</code>方法和<code>orElseGet()</code>方法类似，但是<code>orElse</code>接受一个默认值而不是一个回调函数。下面是这个程序的输出：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">Full Name is set? false
+Full Name: [none]
+Hey Stranger!</code></pre><p>让我们来看看另一个例子：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Optional&lt;String&gt; firstName &#x3D; Optional.of(&quot;Tom&quot;);
+System.out.println(&quot;First Name is set? &quot; + firstName.isPresent());
+System.out.println(&quot;First Name: &quot; + firstName.orElseGet(() -&gt; &quot;[none]&quot;));
+System.out.println(firstName.map(s -&gt; &quot;Hey &quot; + s + &quot;!&quot;).orElse(&quot;Hey Stranger!&quot;));
+System.out.println();</code></pre><p>下面是程序的输出：</p><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">First Name is set? true
+First Name: Tom
+Hey Tom!</code></pre><h2 id="七、Date-Time-API"><a href="#七、Date-Time-API" class="headerlink" title="七、Date/Time API"></a>七、Date/Time API</h2><p>Java 8 在包<code>java.time</code>下包含了一组全新的时间日期API。新的日期API和开源的<code>Joda-Time</code>库差不多，但又不完全一样，下面的例子展示了这组新API里最重要的一些部分：</p><h3 id="1-Clock-时钟"><a href="#1-Clock-时钟" class="headerlink" title="1. Clock 时钟"></a>1. Clock 时钟</h3><p><code>Clock</code>类提供了访问当前日期和时间的方法，Clock是时区敏感的，可以用来取代<code>System.currentTimeMillis()</code>来获取当前的微秒数。某一个特定的时间点也可以使用<code>Instant</code>类来表示，<code>Instant</code>类也可以用来创建老的<code>java.util.Date</code>对象。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Clock clock &#x3D; Clock.systemDefaultZone();
+long millis &#x3D; clock.millis();
+Instant instant &#x3D; clock.instant();
+Date legacyDate &#x3D; Date.from(instant);   &#x2F;&#x2F; legacy java.util.Date</code></pre><h3 id="2-Timezones-时区"><a href="#2-Timezones-时区" class="headerlink" title="2. Timezones 时区"></a>2. Timezones 时区</h3><p>在新API中时区使用<code>ZoneId</code>来表示。时区可以很方便的使用静态方法<code>of</code>来获取到。时区定义了到UTS时间的时间差，在<code>Instant</code>时间点对象到本地日期对象之间转换的时候是极其重要的。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">System.out.println(ZoneId.getAvailableZoneIds());
+&#x2F;&#x2F; prints all available timezone ids
+ZoneId zone1 &#x3D; ZoneId.of(&quot;Europe&#x2F;Berlin&quot;);
+ZoneId zone2 &#x3D; ZoneId.of(&quot;Brazil&#x2F;East&quot;);
+System.out.println(zone1.getRules());
+System.out.println(zone2.getRules());
+&#x2F;&#x2F; ZoneRules[currentStandardOffset&#x3D;+01:00]
+&#x2F;&#x2F; ZoneRules[currentStandardOffset&#x3D;-03:00]</code></pre><h3 id="3-LocalTime-本地时间"><a href="#3-LocalTime-本地时间" class="headerlink" title="3. LocalTime 本地时间"></a>3. LocalTime 本地时间</h3><p><code>LocalTime</code>定义了一个没有时区信息的时间，例如 晚上10点，或者 17:30:15。下面的例子使用前面代码创建的时区创建了两个本地时间。之后比较时间并以小时和分钟为单位计算两个时间的时间差。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">LocalTime now1 &#x3D; LocalTime.now(zone1);
+LocalTime now2 &#x3D; LocalTime.now(zone2);
+System.out.println(now1.isBefore(now2));  &#x2F;&#x2F; false
+long hoursBetween &#x3D; ChronoUnit.HOURS.between(now1, now2);
+long minutesBetween &#x3D; ChronoUnit.MINUTES.between(now1, now2);
+System.out.println(hoursBetween);       &#x2F;&#x2F; -3
+System.out.println(minutesBetween);     &#x2F;&#x2F; -239</code></pre><p><code>LocalTime</code>提供了多种工厂方法来简化对象的创建，包括解析时间字符串。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">LocalTime late &#x3D; LocalTime.of(23, 59, 59);
+System.out.println(late);       &#x2F;&#x2F; 23:59:59
+DateTimeFormatter germanFormatter &#x3D; DateTimeFormatter
+        .ofLocalizedTime(FormatStyle.SHORT)
+        .withLocale(Locale.GERMAN);
+LocalTime leetTime &#x3D; LocalTime.parse(&quot;13:37&quot;, germanFormatter);
+System.out.println(leetTime);   &#x2F;&#x2F; 13:37</code></pre><h3 id="4-LocalDate-本地日期"><a href="#4-LocalDate-本地日期" class="headerlink" title="4. LocalDate 本地日期"></a>4. LocalDate 本地日期</h3><p><code>LocalDate</code>表示了一个确切的日期，比如<code>2014-03-11</code>。该对象值是不可变的，用起来和<code>LocalTime</code>基本一致。下面的例子展示了如何给<code>Date</code>对象加减天/月/年。另外要注意的是这些对象是不可变的，操作返回的总是一个新实例。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">LocalDate today &#x3D; LocalDate.now();
+LocalDate tomorrow &#x3D; today.plus(1, ChronoUnit.DAYS);
+LocalDate yesterday &#x3D; tomorrow.minusDays(2);
+LocalDate independenceDay &#x3D; LocalDate.of(2014, Month.JULY, 4);
+DayOfWeek dayOfWeek &#x3D; independenceDay.getDayOfWeek();
+
+System.out.println(dayOfWeek);    &#x2F;&#x2F; FRIDAY</code></pre><p>从字符串解析一个LocalDate类型和解析LocalTime一样简单。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">DateTimeFormatter germanFormatter &#x3D; DateTimeFormatter
+        .ofLocalizedDate(FormatStyle.MEDIUM)
+        .withLocale(Locale.GERMAN);
+LocalDate xmas &#x3D; LocalDate.parse(&quot;24.12.2014&quot;, germanFormatter);
+System.out.println(xmas);   &#x2F;&#x2F; 2014-12-24</code></pre><h3 id="5-LocalDateTime-本地日期时间"><a href="#5-LocalDateTime-本地日期时间" class="headerlink" title="5. LocalDateTime 本地日期时间"></a>5. LocalDateTime 本地日期时间</h3><p><code>LocalDateTime</code>同时表示了时间和日期，相当于前两节内容合并到一个对象上了。<code>LocalDateTime</code>和<code>LocalTime</code>还有<code>LocalDate</code>一样，都是不可变的。<code>LocalDateTime</code>提供了一些能访问具体字段的方法。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">LocalDateTime sylvester &#x3D; LocalDateTime.of(2014, Month.DECEMBER, 31, 23, 59, 59);
+DayOfWeek dayOfWeek &#x3D; sylvester.getDayOfWeek();
+System.out.println(dayOfWeek);      &#x2F;&#x2F; WEDNESDAY
+Month month &#x3D; sylvester.getMonth();
+System.out.println(month);          &#x2F;&#x2F; DECEMBER
+long minuteOfDay &#x3D; sylvester.getLong(ChronoField.MINUTE_OF_DAY);
+System.out.println(minuteOfDay);    &#x2F;&#x2F; 1439</code></pre><p>只要附加上时区信息，就可以将其转换为一个时间点<code>Instant</code>对象，<code>Instant</code>时间点对象可以很容易的转换为老式的<code>java.util.Date</code>。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">Instant instant &#x3D; sylvester
+        .atZone(ZoneId.systemDefault())
+        .toInstant();
+Date legacyDate &#x3D; Date.from(instant);
+System.out.println(legacyDate);     &#x2F;&#x2F; Wed Dec 31 23:59:59 CET 2014</code></pre><p>格式化<code>LocalDateTime</code>和格式化时间和日期一样的，除了使用预定义好的格式外，我们也可以自己定义格式。代码如下:</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">DateTimeFormatter formatter &#x3D;
+    DateTimeFormatter
+        .ofPattern(&quot;MMM dd, yyyy - HH:mm&quot;);
+LocalDateTime parsed &#x3D; LocalDateTime.parse(&quot;Nov 03, 2014 - 07:13&quot;, formatter);
+String string &#x3D; formatter.format(parsed);
+System.out.println(string);     &#x2F;&#x2F; Nov 03, 2014 - 07:13</code></pre><p>和<code>java.text.NumberFormat</code>不一样的是新版的<code>DateTimeFormatter</code>是不可变的，所以它是线程安全的。</p><p>关于Java8中日期API更多的使用示例可以参考<a target="_blank" rel="noopener external nofollow noreferrer" href="http://blinkfox.com/java-8zhong-guan-yu-ri-qi-he-shi-jian-apide-20ge-shi-yong-shi-li/">Java 8中关于日期和时间API的20个使用示例</a>。</p><h2 id="八、重复注解"><a href="#八、重复注解" class="headerlink" title="八、重复注解"></a>八、重复注解</h2><p>自从Java 5引入了注解机制，这一特性就变得非常流行并且广为使用。然而，使用注解的一个限制是相同的注解在同一位置只能声明一次，不能声明多次。Java 8打破了这条规则，引入了重复注解机制，这样相同的注解可以在同一地方声明多次。</p><p>重复注解机制本身必须用<code>@Repeatable</code>注解。事实上，这并不是语言层面上的改变，更多的是编译器的技巧，底层的原理保持不变。让我们看一个快速入门的例子：</p><pre class="line-numbers language-java" data-language="java"><code class="language-java">import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+public class RepeatingAnnotations &#123;
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Filters &#123;
+        Filter[] value();
+    &#125;
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Repeatable(Filters.class)
+    public @interface Filter &#123;
+        String value();
+    &#125;;
+
+    @Filter(&quot;filter1&quot;)
+    @Filter(&quot;filter2&quot;)
+    public interface Filterable &#123;
+    &#125;
+
+    public static void main(String[] args) &#123;
+        for(Filter filter: Filterable.class.getAnnotationsByType(Filter.class)) &#123;
+            System.out.println(filter.value());
+        &#125;
+    &#125;
+
+&#125;</code></pre><p>正如我们看到的，这里有个使用<code>@Repeatable(Filters.class)</code>注解的注解类<code>Filter</code>，<code>Filters</code>仅仅是<code>Filter</code>注解的数组，但Java编译器并不想让程序员意识到<code>Filters</code>的存在。这样，接口<code>Filterable</code>就拥有了两次<code>Filter</code>（并没有提到<code>Filter</code>）注解。</p><p>同时，反射相关的API提供了新的函数<code>getAnnotationsByType()</code>来返回重复注解的类型（请注意<code>Filterable.class.getAnnotation(Filters.class</code>)`经编译器处理后将会返回Filters的实例）。</p></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/11/27877.html" class="pre-post btn btn-default" title="Java8新特性及使用(二)"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">Java8新特性及使用(二)</span> </a><a href="/blog/2018/11/38926.html" class="next-post btn btn-default" title="Java7新特性及使用"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">Java7新特性及使用</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>

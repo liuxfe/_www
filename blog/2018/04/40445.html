@@ -1,0 +1,196 @@
+<!DOCTYPE HTML><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"><meta http-equiv="Cache-Control" content="no-siteapp"><meta http-equiv="Cache-Control" content="no-transform"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="apple-mobile-web-app-capable" content="Liuxfe的博客"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no,email=no,adress=no"><meta name="browsermode" content="application"><meta name="screen-orientation" content="portrait"><meta name="keywords" content="note"><meta name="description" content="数组数组的标准定义是：一个存储元素的线性集合（collection），元素可以通过索引来任意存取，索引通常是数字，用来计算元素之间存储位置的偏移量。几乎所有的编程语言都有类似的数据结构。然而 J..."><title>数据结构与算法 | Liuxfe的博客</title><link rel="icon" href="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg"><link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css"><link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css"><link rel="stylesheet" href="/css/style.css?rev=@@hash.css"><script src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/extra.min.js"></script></head><!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]--><!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]--><body><header class="main-header" style="background-image:url(https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"><div class="main-header-box"><a class="header-avatar" href="/" title="Liuxfe"><img src="https://cdn.jsdelivr.net/gh/liuxfe/cdn/avatar.jpg" alt="logo头像" class="img-responsive center-block"></a><div class="branding"><h2>-------------</h2></div></div></header><nav class="main-navigation"><div class="container"><div class="row"><div class="col-sm-12"><div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav"><span class="sr-only"></span> <i class="fa fa-bars"></i> </span><a class="navbar-brand" href="https://www.liuxfe.com">Liuxfe的博客</a></div><div class="collapse navbar-collapse" id="main-menu"><ul class="menu"><li role="presentation" class="text-center"><a href="/"><i class="fa"></i> 首页</a></li><li role="presentation" class="text-center"><a href="/blog/"><i class="fa"></i> 博客</a></li><li role="presentation" class="text-center"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://zhwiki.netlify.app"><i class="fa"></i> 维基百科</a></li></ul></div></div></div></div></nav><section class="content-wrap"><div class="container"><div class="row"><main class="col-md-8 main-content m-post"><p id="process"></p><article class="post"><div class="post-head"><h1 id="数据结构与算法">数据结构与算法</h1><div class="post-meta"><span class="categories-meta fa-wrap"><i class="fa fa-folder-open-o"></i> <a class="category-link" href="/blog/category/data-structure/">data structure</a> </span><span class="fa-wrap"><i class="fa fa-tags"></i> <span class="tags-meta"><a class="tag-none-link" href="/blog/tagged/note/" rel="tag">note</a> </span></span><span class="fa-wrap"><i class="fa fa-clock-o"></i> <span class="date-meta">2018/04/18</span></span></div><p class="fa fa-exclamation-triangle warning">本文于<strong> 1143</strong> 天之前发表，文中内容可能已经过时。</p></div><div class="post-body post-content"><h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><p>数组的标准定义是：一个存储元素的线性集合（collection），元素可以通过索引来任意存取，索引通常是数字，用来计算元素之间存储位置的偏移量。几乎所有的编程语言都有类似的数据结构。然而 JavaScript 的数组却略有不同。<br>JavaScript 中的数组是一种特殊的对象，用来表示偏移量的索引是该对象的属性，索引可能是整数。然而，这些数字索引在内部被转换为字符串类型，这是因为 JavaScript 对象中的属性名必须是字符串。数组在 JavaScript 中只是一种特殊的对象，所以效率上不如其他语言中的数组高。<br>JavaScript 中的数组，严格来说应该称作对象，是特殊的 JavaScript 对象，在内部被归类为数组。由于 Array 在 JavaScript 中被当作对象，因此它有许多属性和方法可以在编程时使用。</p><h2 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h2><p>双向链表属于链表的一种，也叫双链表，双向即是说它的链接方向是双向的，它由若干个节点组成，每个节点都包含下一个节点和上一个节点的指针，所以从双向链表的任意节点开始，都能很方便访问它的前驱结点和后继节点。</p><h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p><strong>1、</strong>创建双链表时无需指定链表的长度。<br><strong>2、</strong>比起单链表，双链表需要多一个指针用于指向前驱节点，所以需要存储空间比单链表多一点。<br><strong>3、</strong>双链表的插入和删除需要同时维护 next 和 prev 两个指针。<br><strong>4、</strong>双链表中的元素访问需要通过顺序访问，即要通过遍历的方式来寻找元素。</p><h3 id="执行过程图解"><a href="#执行过程图解" class="headerlink" title="执行过程图解"></a>执行过程图解</h3><h4 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h4><p>创建一个空链表：<br><img src="/images/data-structure-and-algorithm/img1.png" alt="img1.png"></p><h4 id="插入链尾"><a href="#插入链尾" class="headerlink" title="插入链尾"></a>插入链尾</h4><p>将<code>the monster is coming</code>这些单词按顺序分别插入尾部，创建“the”节点：<br><img src="/images/data-structure-and-algorithm/img2.png" alt="img2.png"></p><p>连接起来：<br><img src="/images/data-structure-and-algorithm/img3.png" alt="img3.png"></p><p>创建“monster”节点：<br><img src="/images/data-structure-and-algorithm/img4.png" alt="img4.png"></p><p>再连接起来：<br><img src="/images/data-structure-and-algorithm/img5.png" alt="img5.png"></p><p>以此类推，将剩下的节点全部创建并连接起来：<br><img src="/images/data-structure-and-algorithm/img6.png" alt="img6.png"></p><p><img src="/images/data-structure-and-algorithm/img7.png" alt="img7.png"></p><h4 id="创建迭代器"><a href="#创建迭代器" class="headerlink" title="创建迭代器"></a>创建迭代器</h4><p>迭代器的 current 指针初始指向head：<br><img src="/images/data-structure-and-algorithm/img8.png" alt="img8.png"></p><p>执行两次 next 操作， current 指针指向索引为2的节点：<br><img src="/images/data-structure-and-algorithm/img9.png" alt="img9.png"></p><p>此时的节点值为：<br><img src="/images/data-structure-and-algorithm/img10.png" alt="img10.png"></p><p>设置 current 指针指向索引为3的节点：<br><img src="/images/data-structure-and-algorithm/img11.png" alt="img11.png"></p><h4 id="插入节点"><a href="#插入节点" class="headerlink" title="插入节点"></a>插入节点</h4><p>在索引1后面插入“big”节点。先将 current 指针指向索引为1的节点，创建一个”big”新节点：<br><img src="/images/data-structure-and-algorithm/img12.png" alt="img12.png"></p><p>插入到 current 指向位置：<br><img src="/images/data-structure-and-algorithm/img13.png" alt="img13.png"></p><h4 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h4><p>将“big”节点删除，移动当前指针 current 到“big”节点位置：<br><img src="/images/data-structure-and-algorithm/img14.png" alt="img14.png"></p><p>执行删除操作，断掉“big”节点与前后两节点的 next 和 prev 指针，然后将“the”节点与“monster”节点关联起来：<br><img src="/images/data-structure-and-algorithm/img15.png" alt="img15.png"><br><img src="/images/data-structure-and-algorithm/img16.png" alt="img16.png"></p><h4 id="双向循环链表"><a href="#双向循环链表" class="headerlink" title="双向循环链表"></a>双向循环链表</h4><p>前面的双向链表的 head 节点和链尾没有连接关系，所以如果要访问最后一个节点的话需要从头开始遍历，直到最后一个节点。在双向链表基础上改进一下，把 header 节点的 prev 指针指向最后一个节点，而最后一个节点的 next 指针指向 header 节点，于是便构成双向循环链表。<br><img src="/images/data-structure-and-algorithm/img17.png" alt="img17.png"></p><h3 id="实现细节"><a href="#实现细节" class="headerlink" title="实现细节"></a>实现细节</h3><p>我们的链表将包括两个构造函数：Node 和 DoublyList。看看它们是怎样运作的。</p><h4 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h4><p><strong>data：</strong>存储数据。<br><strong>next：</strong>指向链表中下一个节点的指针。<br><strong>previous：</strong>指向链表中前一个节点的指针。</p><h4 id="DoublyList"><a href="#DoublyList" class="headerlink" title="DoublyList"></a>DoublyList</h4><p><strong>_length：</strong>保存链表中节点的个数。<br><strong>head：</strong>指定一个节点作为链表的头节点。<br><strong>head：</strong>tail 指定一个节点作为链表的尾节点。<br><strong>add(value)：</strong>向链表中添加一个节点。<br><strong>searchNodeAt(position)：</strong>找到在列表中指定位置 n 上的节点。<br><strong>remove(position)：</strong>删除链表中指定位置上的节点。</p><h4 id="节点模板"><a href="#节点模板" class="headerlink" title="节点模板"></a>节点模板</h4><p>在实现中，将会创建一个名为<code>Node</code>的构造函数：</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">function Node(value) &#123;
+  this.data &#x3D; value;
+  this.previous &#x3D; null;
+  this.next &#x3D; null;
+&#125;</code></pre><p>想要实现双向链表的双向遍历，我们需要指向链表两个方向的属性。这些属性被命名为<code>previous</code>和<code>next</code>。</p><p>接下来，我们需要实现<code>DoublyList</code>并添加三个属性：<code>_length</code>，<code>head</code>和<code>tail</code>。<br>与单链表不同，双向链表包含对链表开头和结尾节点的引用。 由于<code>DoublyList</code>刚被实例化时并不包含任何节点，所以<code>head</code>和<code>tail</code>的默认值都被设置为null。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">function DoublyList() &#123;
+  this._length &#x3D; 0;
+  this.head &#x3D; null;
+  this.tail &#x3D; null;
+&#125;</code></pre><h4 id="操作节点"><a href="#操作节点" class="headerlink" title="操作节点"></a>操作节点</h4><p>接下来我们讨论以下方法：<code>add(value)</code>，<code>remove(position)</code>和<code>searchNodeAt(position)</code>。所有这些方法都用于单链表，然而，它们必须被重写为可以双向遍历。</p><h5 id="方法1-3-add-value"><a href="#方法1-3-add-value" class="headerlink" title="方法1/3 add(value)"></a>方法1/3 <code>add(value)</code></h5><pre class="line-numbers language-js" data-language="js"><code class="language-js">DoublyList.prototype.add &#x3D; function(value) &#123;
+  var node &#x3D; new Node(value);
+
+  if (this._length) &#123;
+    this.tail.next &#x3D; node;
+    node.previous &#x3D; this.tail;
+    this.tail &#x3D; node;
+  &#125; else &#123;
+    this.head &#x3D; node;
+    this.tail &#x3D; node;
+  &#125;
+
+  this._length++;
+    
+  return node;
+&#125;;</code></pre><p>在这个方法中，存在两种可能。首先，如果链表是空的，则给它的<code>head</code>和<code>tail</code>分配节点。其次，如果链表中已经存在节点，则查找链表的尾部并把新节点分配给<code>tail.next</code>；同样，我们需要配置新的尾部以供进行双向遍历。换句话说，我们需要把<code>tail.previous</code>设置为原来的尾部。</p><h5 id="方法2-3-searchNodeAt-position"><a href="#方法2-3-searchNodeAt-position" class="headerlink" title="方法2/3: searchNodeAt(position)"></a>方法2/3: <code>searchNodeAt(position)</code></h5><p>创建一个名为<code>searchNodeAt(position)</code>的方法，它接受一个名为<code>position</code>的参数。这个参数是个整数，用来表示链表中的位置<code>n</code>。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">DoublyList.prototype.searchNodeAt &#x3D; function(position) &#123;
+  var currentNode &#x3D; this.head,
+    length &#x3D; this._length,
+    count &#x3D; 1,
+    message &#x3D; &#123;failure: &#39;Failure: non-existent node in this list.&#39;&#125;;
+
+  &#x2F;&#x2F; 1st use-case: an invalid position 
+  if (length &#x3D;&#x3D;&#x3D; 0 || position &lt; 1 || position &gt; length) &#123;
+    throw new Error(message.failure);
+  &#125;
+
+  &#x2F;&#x2F; 2nd use-case: a valid position 
+  while (count &lt; position) &#123;
+    currentNode &#x3D; currentNode.next;
+    count++;
+  &#125;
+
+  return currentNode;
+&#125;;</code></pre><p>在<code>if</code>中检查第一种情况：参数非法。如果传给<code>searchNodeAt(position)</code>的索引是有效的，那么我们执行第二种情况 —— <code>while</code>循环。 在<code>while</code>的每次循环中，指向头的<code>currentNode</code>被重新指向链表中的下一个节点。这个循环不断执行，一直到<code>count</code>等于<code>position</code>。</p><h5 id="方法3-3-remove-position"><a href="#方法3-3-remove-position" class="headerlink" title="方法3/3: remove(position)"></a>方法3/3: <code>remove(position)</code></h5><p>理解这个方法是最具挑战性的。我先写出代码，然后再解释它。</p><pre class="line-numbers language-js" data-language="js"><code class="language-js">DoublyList.prototype.remove &#x3D; function(position) &#123;
+    var currentNode &#x3D; this.head,
+        length &#x3D; this._length,
+        count &#x3D; 1,
+        message &#x3D; &#123;failure: &#39;Failure: non-existent node in this list.&#39;&#125;,
+        beforeNodeToDelete &#x3D; null,
+        nodeToDelete &#x3D; null,
+        deletedNode &#x3D; null;
+ 
+    &#x2F;&#x2F; 1st use-case: an invalid position
+    if (length &#x3D;&#x3D;&#x3D; 0 || position &lt; 1 || position &gt; length) &#123;
+        throw new Error(message.failure);
+    &#125;
+ 
+    &#x2F;&#x2F; 2nd use-case: the first node is removed
+    if (position &#x3D;&#x3D;&#x3D; 1) &#123;
+        this.head &#x3D; currentNode.next;
+ 
+        &#x2F;&#x2F; 2nd use-case: there is a second node
+        if (!this.head) &#123;
+            this.head.previous &#x3D; null;
+        &#x2F;&#x2F; 2nd use-case: there is no second node
+        &#125; else &#123;
+            this.tail &#x3D; null;
+        &#125;
+ 
+    &#x2F;&#x2F; 3rd use-case: the last node is removed
+    &#125; else if (position &#x3D;&#x3D;&#x3D; this._length) &#123;
+        this.tail &#x3D; this.tail.previous;
+        this.tail.next &#x3D; null;
+    &#x2F;&#x2F; 4th use-case: a middle node is removed
+    &#125; else &#123;
+        while (count &lt; position) &#123;
+            currentNode &#x3D; currentNode.next;
+            count++;
+        &#125;
+ 
+        beforeNodeToDelete &#x3D; currentNode.previous;
+        nodeToDelete &#x3D; currentNode;
+        afterNodeToDelete &#x3D; currentNode.next;
+ 
+        beforeNodeToDelete.next &#x3D; afterNodeToDelete;
+        afterNodeToDelete.previous &#x3D; beforeNodeToDelete;
+        deletedNode &#x3D; nodeToDelete;
+        nodeToDelete &#x3D; null;
+    &#125;
+ 
+    this._length--;
+    return message.success;
+&#125;;</code></pre><p><code>remove(position)</code>处理以下四种情况：<br><strong>1、</strong>如果<code>remove(position)</code>的参数传递的位置存在, 将会抛出一个错误。<br><strong>2、</strong>如果remove(position)的参数传递的位置是链表的第一个节点（head），将把head赋值给deletedNode ，然后把head重新分配到链表中的下一个节点。 此时，我们必须考虑链表中否存在多个节点。 如果答案为否，头部将被分配为null，之后进入if-else语句的if部分。 在if的代码中，还必须将tail设置为null —— 换句话说，我们返回到一个空的双向链表的初始状态。如果删除列表中的第一个节点，并且链表中存在多个节点，那么我们输入if-else语句的else部分。 在这种情况下，我们必须正确地将head的previous属性设置为null —— 在链表的头前面是没有节点的。<br><strong>3、</strong>如果remove(position)的参数传递的位置是链表的尾部，首先把tail赋值给deletedNode，然后tail被重新赋值为尾部之前的那个节点，最后新尾部后面没有其他节点，需要将其next值设置为null。<br><strong>4、</strong>这里发生了很多事情，所以我将重点关注逻辑，而不是每一行代码。 一旦CurrentNode指向的节点是将要被remove(position)删除的节点时，就退出while循环。这时我们把nodeToDelete之后的节点重新赋值给beforeNodeToDelete.next。相应的，<br>把nodeToDelete之前的节点重新赋值给afterNodeToDelete.previous。——换句话说，我们把指向已删除节点的指针，改为指向正确的节点。最后，把nodeToDelete 赋值为null。</p><p>最后，把链表的长度减1，返回deletedNode。</p><h4 id="完整代码实现"><a href="#完整代码实现" class="headerlink" title="完整代码实现"></a>完整代码实现</h4><pre class="line-numbers language-js" data-language="js"><code class="language-js">function Node(value) &#123;
+    this.data &#x3D; value;
+    this.previous &#x3D; null;
+    this.next &#x3D; null;
+&#125;
+ 
+function DoublyList() &#123;
+    this._length &#x3D; 0;
+    this.head &#x3D; null;
+    this.tail &#x3D; null;
+&#125;
+ 
+DoublyList.prototype.add &#x3D; function(value) &#123;
+    var node &#x3D; new Node(value);
+ 
+    if (this._length) &#123;
+        this.tail.next &#x3D; node;
+        node.previous &#x3D; this.tail;
+        this.tail &#x3D; node;
+    &#125; else &#123;
+        this.head &#x3D; node;
+        this.tail &#x3D; node;
+    &#125;
+ 
+    this._length++;
+ 
+    return node;
+&#125;;
+ 
+DoublyList.prototype.searchNodeAt &#x3D; function(position) &#123;
+    var currentNode &#x3D; this.head,
+        length &#x3D; this._length,
+        count &#x3D; 1,
+        message &#x3D; &#123;failure: &#39;Failure: non-existent node in this list.&#39;&#125;;
+ 
+    &#x2F;&#x2F; 1st use-case: an invalid position
+    if (length &#x3D;&#x3D;&#x3D; 0 || position &lt; 1 || position &gt; length) &#123;
+        throw new Error(message.failure);
+    &#125;
+ 
+    &#x2F;&#x2F; 2nd use-case: a valid position
+    while (count &lt; position) &#123;
+        currentNode &#x3D; currentNode.next;
+        count++;
+    &#125;
+ 
+    return currentNode;
+&#125;;
+ 
+DoublyList.prototype.remove &#x3D; function(position) &#123;
+    var currentNode &#x3D; this.head,
+        length &#x3D; this._length,
+        count &#x3D; 1,
+        message &#x3D; &#123;failure: &#39;Failure: non-existent node in this list.&#39;&#125;,
+        beforeNodeToDelete &#x3D; null,
+        nodeToDelete &#x3D; null,
+        deletedNode &#x3D; null;
+ 
+    &#x2F;&#x2F; 1st use-case: an invalid position
+    if (length &#x3D;&#x3D;&#x3D; 0 || position &lt; 1 || position &gt; length) &#123;
+        throw new Error(message.failure);
+    &#125;
+ 
+    &#x2F;&#x2F; 2nd use-case: the first node is removed
+    if (position &#x3D;&#x3D;&#x3D; 1) &#123;
+        this.head &#x3D; currentNode.next;
+ 
+        &#x2F;&#x2F; 2nd use-case: there is a second node
+        if (!this.head) &#123;
+            this.head.previous &#x3D; null;
+        &#x2F;&#x2F; 2nd use-case: there is no second node
+        &#125; else &#123;
+            this.tail &#x3D; null;
+        &#125;
+ 
+    &#x2F;&#x2F; 3rd use-case: the last node is removed
+    &#125; else if (position &#x3D;&#x3D;&#x3D; this._length) &#123;
+        this.tail &#x3D; this.tail.previous;
+        this.tail.next &#x3D; null;
+    &#x2F;&#x2F; 4th use-case: a middle node is removed
+    &#125; else &#123;
+        while (count &lt; position) &#123;
+            currentNode &#x3D; currentNode.next;
+            count++;
+        &#125;
+ 
+        beforeNodeToDelete &#x3D; currentNode.previous;
+        nodeToDelete &#x3D; currentNode;
+        afterNodeToDelete &#x3D; currentNode.next;
+ 
+        beforeNodeToDelete.next &#x3D; afterNodeToDelete;
+        afterNodeToDelete.previous &#x3D; beforeNodeToDelete;
+        deletedNode &#x3D; nodeToDelete;
+        nodeToDelete &#x3D; null;
+    &#125;
+ 
+    this._length--;
+ 
+    return message.success;
+&#125;;</code></pre></div><div class="post-footer"><div></div><div></div></div></article><div class="article-nav prev-next-wrap clearfix"><a href="/blog/2018/04/41682.html" class="pre-post btn btn-default" title="设计模式"><i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span> <span class="hidden-xs">设计模式</span> </a><a href="/blog/2018/04/25622.html" class="next-post btn btn-default" title="threejs 开发汇总"><span class="hidden-lg">下一篇</span> <span class="hidden-xs">threejs 开发汇总</span><i class="fa fa-angle-right fa-fw"></i></a></div><div id="comments"><p>评论系统未开启，无法评论！</p></div><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2669241897" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script></main><aside class="col-md-4 sidebar"><div class="widget"><h3 class="title">赞助广告</h3><ins class="adsbygoogle" style="display:block;width:100%;height:280px" data-ad-client="ca-pub-9312750344484857" data-ad-slot="2014094445" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({})</script><p style="text-align:center">想要出现再此！</p></div><div class="widget"><h3 class="title">分类</h3><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/category/Mac-OS/"><i class="fa" aria-hidden="true">Mac OS</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Nuxtjs/"><i class="fa" aria-hidden="true">Nuxtjs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/Objective-C/"><i class="fa" aria-hidden="true">Objective-C</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/babel/"><i class="fa" aria-hidden="true">babel</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/css/"><i class="fa" aria-hidden="true">css</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/danger/"><i class="fa" aria-hidden="true">danger</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/data-structure/"><i class="fa" aria-hidden="true">data structure</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/design/"><i class="fa" aria-hidden="true">design</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es6/"><i class="fa" aria-hidden="true">es6</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/es7/"><i class="fa" aria-hidden="true">es7</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/eslint/"><i class="fa" aria-hidden="true">eslint</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/flutter/"><i class="fa" aria-hidden="true">flutter</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/git/"><i class="fa" aria-hidden="true">git</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/github/"><i class="fa" aria-hidden="true">github</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/golang/"><i class="fa" aria-hidden="true">golang</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/http/"><i class="fa" aria-hidden="true">http</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/java/"><i class="fa" aria-hidden="true">java</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/javascript/"><i class="fa" aria-hidden="true">javascript</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/jest/"><i class="fa" aria-hidden="true">jest</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/koa/"><i class="fa" aria-hidden="true">koa</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/lerna/"><i class="fa" aria-hidden="true">lerna</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/netlify/"><i class="fa" aria-hidden="true">netlify</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nginx/"><i class="fa" aria-hidden="true">nginx</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/nodejs/"><i class="fa" aria-hidden="true">nodejs</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/npm/"><i class="fa" aria-hidden="true">npm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/programm/"><i class="fa" aria-hidden="true">programm</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/react/"><i class="fa" aria-hidden="true">react</i></a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux/"><i class="fa" aria-hidden="true">redux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/redux-thunk/"><i class="fa" aria-hidden="true">redux-thunk</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/regex/"><i class="fa" aria-hidden="true">regex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/rollup/"><i class="fa" aria-hidden="true">rollup</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/shell/"><i class="fa" aria-hidden="true">shell</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/sketch/"><i class="fa" aria-hidden="true">sketch</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/the-super-tiny-compiler/"><i class="fa" aria-hidden="true">the-super-tiny-compiler</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/threejs/"><i class="fa" aria-hidden="true">threejs</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/typescript/"><i class="fa" aria-hidden="true">typescript</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vscode/"><i class="fa" aria-hidden="true">vscode</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue/"><i class="fa" aria-hidden="true">vue</i></a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vue-router/"><i class="fa" aria-hidden="true">vue-router</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/vuex/"><i class="fa" aria-hidden="true">vuex</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/webpack/"><i class="fa" aria-hidden="true">webpack</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/wechat/"><i class="fa" aria-hidden="true">wechat</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link current" href="/blog/category/%E5%89%8D%E7%AB%AF/"><i class="fa" aria-hidden="true">前端</i></a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%90%8E%E7%AB%AF/"><i class="fa" aria-hidden="true">后端</i></a><span class="category-list-count">25</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E5%BB%BA%E7%AB%99%E6%95%99%E7%A8%8B/"><i class="fa" aria-hidden="true">建站教程</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fa" aria-hidden="true">数据库</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E6%9D%82%E8%B0%88/"><i class="fa" aria-hidden="true">杂谈</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%A7%91%E6%8A%80%E7%88%B1%E5%A5%BD%E8%80%85%E5%91%A8%E5%88%8A-%E9%98%AE%E4%B8%80%E5%B3%B0/"><i class="fa" aria-hidden="true">科技爱好者周刊(阮一峰)</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"><i class="fa" aria-hidden="true">编程之道</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E5%85%B7/"><i class="fa" aria-hidden="true">软件工具</i></a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/category/%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/"><i class="fa" aria-hidden="true">软件设计</i></a><span class="category-list-count">16</span></li></ul></div><div class="widget"><h3 class="title">归档</h3><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/03/"><i class="fa" aria-hidden="true">2020年03月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2020/01/"><i class="fa" aria-hidden="true">2020年01月</i></a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/12/"><i class="fa" aria-hidden="true">2019年12月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/11/"><i class="fa" aria-hidden="true">2019年11月</i></a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/04/"><i class="fa" aria-hidden="true">2019年04月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/03/"><i class="fa" aria-hidden="true">2019年03月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/02/"><i class="fa" aria-hidden="true">2019年02月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2019/01/"><i class="fa" aria-hidden="true">2019年01月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/12/"><i class="fa" aria-hidden="true">2018年12月</i></a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">24</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">28</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/09/"><i class="fa" aria-hidden="true">2018年09月</i></a><span class="archive-list-count">21</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/08/"><i class="fa" aria-hidden="true">2018年08月</i></a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/07/"><i class="fa" aria-hidden="true">2018年07月</i></a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/06/"><i class="fa" aria-hidden="true">2018年06月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/04/"><i class="fa" aria-hidden="true">2018年04月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/2018/03/"><i class="fa" aria-hidden="true">2018年03月</i></a><span class="archive-list-count">1</span></li></ul></div><div class="widget"><h3 class="title">标签云</h3><div class="content tag-cloud"><a href="/blog/tagged/Apache/" style="font-size:13.33px">Apache</a> <a href="/blog/tagged/CPU%E7%BC%93%E5%AD%98/" style="font-size:10px">CPU缓存</a> <a href="/blog/tagged/CSS/" style="font-size:10px">CSS</a> <a href="/blog/tagged/Cryptojs/" style="font-size:10px">Cryptojs</a> <a href="/blog/tagged/DevOps/" style="font-size:10px">DevOps</a> <a href="/blog/tagged/Equality-operator/" style="font-size:10px">Equality operator</a> <a href="/blog/tagged/Fenix/" style="font-size:10px">Fenix</a> <a href="/blog/tagged/Git/" style="font-size:10px">Git</a> <a href="/blog/tagged/GitLab-CI/" style="font-size:10px">GitLab CI</a> <a href="/blog/tagged/Google/" style="font-size:10px">Google</a> <a href="/blog/tagged/JAVA-HOME/" style="font-size:10px">JAVA_HOME</a> <a href="/blog/tagged/JPA/" style="font-size:10px">JPA</a> <a href="/blog/tagged/Java/" style="font-size:20px">Java</a> <a href="/blog/tagged/JavaScript/" style="font-size:14.44px">JavaScript</a> <a href="/blog/tagged/Jenkins/" style="font-size:10px">Jenkins</a> <a href="/blog/tagged/Linux/" style="font-size:13.33px">Linux</a> <a href="/blog/tagged/MVEL/" style="font-size:11.11px">MVEL</a> <a href="/blog/tagged/Markdown/" style="font-size:10px">Markdown</a> <a href="/blog/tagged/PostgreSQL/" style="font-size:10px">PostgreSQL</a> <a href="/blog/tagged/React-Fire/" style="font-size:10px">React Fire</a> <a href="/blog/tagged/Semicolon/" style="font-size:10px">Semicolon</a> <a href="/blog/tagged/Spring/" style="font-size:11.11px">Spring</a> <a href="/blog/tagged/SpringBoot/" style="font-size:10px">SpringBoot</a> <a href="/blog/tagged/Typora/" style="font-size:10px">Typora</a> <a href="/blog/tagged/UML/" style="font-size:11.11px">UML</a> <a href="/blog/tagged/Vue/" style="font-size:10px">Vue</a> <a href="/blog/tagged/ajax/" style="font-size:10px">ajax</a> <a href="/blog/tagged/analysis-package/" style="font-size:10px">analysis package</a> <a href="/blog/tagged/async/" style="font-size:10px">async</a> <a href="/blog/tagged/cheerio/" style="font-size:10px">cheerio</a> <a href="/blog/tagged/commit-message/" style="font-size:10px">commit message</a> <a href="/blog/tagged/communication/" style="font-size:10px">communication</a> <a href="/blog/tagged/component/" style="font-size:10px">component</a> <a href="/blog/tagged/currying/" style="font-size:10px">currying</a> <a href="/blog/tagged/decorator/" style="font-size:10px">decorator</a> <a href="/blog/tagged/fiber/" style="font-size:10px">fiber</a> <a href="/blog/tagged/fix-bug/" style="font-size:10px">fix bug</a> <a href="/blog/tagged/function/" style="font-size:10px">function</a> <a href="/blog/tagged/git-clone/" style="font-size:10px">git clone</a> <a href="/blog/tagged/golang/" style="font-size:10px">golang</a> <a href="/blog/tagged/hexo/" style="font-size:14.44px">hexo</a> <a href="/blog/tagged/hooks/" style="font-size:10px">hooks</a> <a href="/blog/tagged/http/" style="font-size:10px">http</a> <a href="/blog/tagged/justify/" style="font-size:10px">justify</a> <a href="/blog/tagged/let/" style="font-size:10px">let</a> <a href="/blog/tagged/login/" style="font-size:10px">login</a> <a href="/blog/tagged/module/" style="font-size:11.11px">module</a> <a href="/blog/tagged/nginx/" style="font-size:11.11px">nginx</a> <a href="/blog/tagged/note/" style="font-size:18.89px">note</a> <a href="/blog/tagged/npm/" style="font-size:11.11px">npm</a> <a href="/blog/tagged/npx/" style="font-size:10px">npx</a> <a href="/blog/tagged/open/" style="font-size:10px">open</a> <a href="/blog/tagged/package/" style="font-size:10px">package</a> <a href="/blog/tagged/package-json/" style="font-size:10px">package.json</a> <a href="/blog/tagged/path/" style="font-size:10px">path</a> <a href="/blog/tagged/pm2/" style="font-size:11.11px">pm2</a> <a href="/blog/tagged/promise/" style="font-size:10px">promise</a> <a href="/blog/tagged/refs/" style="font-size:10px">refs</a> <a href="/blog/tagged/rem/" style="font-size:10px">rem</a> <a href="/blog/tagged/render/" style="font-size:10px">render</a> <a href="/blog/tagged/require/" style="font-size:10px">require</a> <a href="/blog/tagged/rzero/" style="font-size:10px">rzero</a> <a href="/blog/tagged/selector/" style="font-size:10px">selector</a> <a href="/blog/tagged/service/" style="font-size:10px">service</a> <a href="/blog/tagged/setTimeout/" style="font-size:10px">setTimeout</a> <a href="/blog/tagged/source/" style="font-size:16.67px">source</a> <a href="/blog/tagged/ssh/" style="font-size:10px">ssh</a> <a href="/blog/tagged/ssr/" style="font-size:10px">ssr</a> <a href="/blog/tagged/timer/" style="font-size:10px">timer</a> <a href="/blog/tagged/tools/" style="font-size:10px">tools</a> <a href="/blog/tagged/tree-shaking/" style="font-size:10px">tree-shaking</a> <a href="/blog/tagged/typecho/" style="font-size:15.56px">typecho</a> <a href="/blog/tagged/typecho%E6%8F%92%E4%BB%B6/" style="font-size:15.56px">typecho插件</a> <a href="/blog/tagged/types/" style="font-size:10px">types</a> <a href="/blog/tagged/utils/" style="font-size:10px">utils</a> <a href="/blog/tagged/virtual-dom/" style="font-size:10px">virtual dom</a> <a href="/blog/tagged/vscode/" style="font-size:10px">vscode</a> <a href="/blog/tagged/wasm/" style="font-size:13.33px">wasm</a> <a href="/blog/tagged/webassembly/" style="font-size:13.33px">webassembly</a> <a href="/blog/tagged/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size:10px">位运算</a> <a href="/blog/tagged/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size:11.11px">单元测试</a> <a href="/blog/tagged/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" style="font-size:10px">性能测试</a> <a href="/blog/tagged/%E6%95%B4%E6%B4%81%E4%BB%A3%E7%A0%81/" style="font-size:10px">整洁代码</a> <a href="/blog/tagged/%E6%B5%8B%E8%AF%95/" style="font-size:10px">测试</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" style="font-size:10px">设计原则</a> <a href="/blog/tagged/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" style="font-size:17.78px">设计模式</a> <a href="/blog/tagged/%E9%87%8D%E6%9E%84/" style="font-size:10px">重构</a> <a href="/blog/tagged/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%BC%96%E7%A8%8B/" style="font-size:12.22px">面向对象编程</a></div></div></aside></div></div></section><footer class="main-footer"><div class="container"><div class="row"></div></div></footer><a id="back-to-top" class="icon-btn hide"><i class="fa fa-chevron-up"></i></a><div class="copyright"><div class="container"><div class="row"><div class="col-sm-12"><div class="busuanzi"></div></div><div class="col-sm-12"><span>Copyright &copy; 2021 - 2021 Liuxfe</span></div></div></div></div><script src="/js/app.js?rev=@@hash.js"></script></body></html>
