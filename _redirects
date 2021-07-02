@@ -1,7 +1,7 @@
-http://twuu.liuxfe.com/*   https://twuu234.netlify.app/:splat 301!
-http://zwiki.liuxfe.com/*  https://zhwiki.netlify.app/:splat  301!
+http://twuu.liuxfe.com/*   https://twuu234.vercel.app/:splat  301!
+https://twuu.liuxfe.com/*  https://twuu234.vercel.app/:splat  301!
 
-https://twuu.liuxfe.com/*  https://twuu234.netlify.app/:splat 301!
+http://zwiki.liuxfe.com/*  https://zhwiki.netlify.app/:splat  301!
 https://zwiki.liuxfe.com/* https://zhwiki.netlify.app/:splat  301!
 
 
