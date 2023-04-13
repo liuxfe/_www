@@ -1,8 +1,3 @@
 
-http://man.liuxfe.com/*.html  https://linux.liuxfe.com/man1::splat 301!
-https://man.liuxfe.com/*.html https://linux.liuxfe.com/man1::splat 301!
-http://man.liuxfe.com/*       https://linux.liuxfe.com/man1::splat 301!
-https://man.liuxfe.com/*      https://linux.liuxfe.com/man1::splat 301!
-
 /blog/tags/*        /blog/tagged/:splat   301!
 /blog/categories/*  /blog/category/:splat 301!
